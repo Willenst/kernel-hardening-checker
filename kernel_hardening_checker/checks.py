@@ -710,6 +710,9 @@ def add_sysctl_checks(l: List[ChecklistObjType], _arch: StrOrNone) -> None:
     l += [SysctlCheck('self_protection', 'a13xp0p0v', 'kernel.oops_limit', '100')]
     l += [SysctlCheck('self_protection', 'a13xp0p0v', 'kernel.warn_limit', '100')]
 
+    l += [OR(SysctlCheck('cut_attack_surface', 'grsec', 'kernel.io_uring_disabled', '2'),
+             KconfigCheck('cut_attack_surface', 'grsec', 'IO_URING', 'is not set'))]
+
     l += [SysctlCheck('cut_attack_surface', 'kspp', 'kernel.dmesg_restrict', '1')]
     l += [SysctlCheck('cut_attack_surface', 'kspp', 'kernel.perf_event_paranoid', '3')] # with a custom patch, see https://lwn.net/Articles/696216/
     l += [SysctlCheck('cut_attack_surface', 'kspp', 'user.max_user_namespaces', '0')] # may break the upower daemon in Ubuntu
