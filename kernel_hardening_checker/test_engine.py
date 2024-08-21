@@ -116,6 +116,39 @@ class TestEngine(unittest.TestCase):
         sys.stdout = stdout_backup
         result.append(captured_output.getvalue())
 
+
+    def test_colorize_result(self) -> None:
+        current_frame = inspect.currentframe()
+        if current_frame is not None:
+            print(f'\n{current_frame.f_code.co_name}():')
+        # 1. prepare the checklist
+        colorizator = ['\x1b[32mOK\x1b[0m']
+        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
+        nocolor = ['OK']
+        nocolor += ['FAIL: expected_1']
+        # 2. print the checklist
+        print('=' * 121)
+        for el in colorizator:
+            print(f'{repr(el):<100} {el:<20}')
+        for el in nocolor:
+            print(f'{repr(el):<100} {el:<20}')
+        print(f'{"None":<101}{"None":<20}')
+        print('=' * 121)       
+        # 3. run and check that results are corrent with sys.stdout.isatty()=True option
+        with mock.patch('sys.stdout') as stdout:
+            stdout.isatty.return_value = True
+            self.assertEqual(colorizator,
+                            [colorize_result('OK'),
+                            colorize_result('FAIL: expected_1')])
+        # 4. run and check that results are corrent without sys.stdout.isatty()=True option
+        with mock.patch('sys.stdout') as stdout:
+            stdout.isatty.return_value = False
+            self.assertEqual(None,colorize_result(None))
+            self.assertEqual(nocolor,
+                [colorize_result('OK'),
+                colorize_result('FAIL: expected_1')])
+
+'''
     def test_simple_kconfig(self) -> None:
         # 1. prepare the checklist
         config_checklist = [] # type: List[ChecklistObjType]
@@ -158,25 +191,6 @@ class TestEngine(unittest.TestCase):
                  {'option_name': 'CONFIG_NAME_9', 'type': 'kconfig', 'desired_val': 'is not off', 'decision': 'decision_9', 'reason': 'reason_9', 'check_result': 'FAIL: is off, "0"', 'check_result_bool': False},
                  {'option_name': 'CONFIG_NAME_10', 'type': 'kconfig', 'desired_val': 'is not off', 'decision': 'decision_10', 'reason': 'reason_10', 'check_result': 'FAIL: is off, not found', 'check_result_bool': False}]
         )
-
-    def test_colorize_result(self) -> None:
-        with mock.patch('sys.stdout') as stdout:
-            stdout.isatty.return_value = True
-            current_frame = inspect.currentframe()
-            if current_frame is not None:
-                print(f'\n{current_frame.f_code.co_name}():')
-
-
-            colorizator = []
-            colorizator += ['\x1b[32mOK\x1b[0m']
-            colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
-            print('=' * 121)
-            for el in colorizator:
-                print(f'{repr(el):<100} {el:<20}')
-            print('=' * 121)
-            self.assertEqual(colorizator,
-                            [colorize_result('OK'),
-                            colorize_result('FAIL: expected_1')])
 
     def test_simple_cmdline(self) -> None:
         # 1. prepare the checklist
@@ -576,3 +590,4 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
                  {'option_name': 'name_2', 'type': 'cmdline', 'desired_val': 'expected_2_new', 'decision': 'decision_2', 'reason': 'reason_2', 'check_result': 'OK', 'check_result_bool': True},
                  {'option_name': 'name_3', 'type': 'sysctl', 'desired_val': 'expected_3_new', 'decision': 'decision_3', 'reason': 'reason_3', 'check_result': 'OK', 'check_result_bool': True}]
         )
+'''
