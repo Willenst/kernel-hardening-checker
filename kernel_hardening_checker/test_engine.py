@@ -17,8 +17,8 @@ import sys
 import json
 import inspect
 from typing import Union, Optional, List, Dict, Tuple
-from .engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
-from .engine import populate_with_data, perform_checks, override_expected_value
+from kernel_hardening_checker.engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
+from kernel_hardening_checker.engine import populate_with_data, perform_checks, override_expected_value, colorize_result, print_unknown_options
 
 
 ResultType = List[Union[Dict[str, StrOrBool], str]]
@@ -114,6 +114,33 @@ class TestEngine(unittest.TestCase):
                 opt.table_print(None, True) # normal mode, with_results
         sys.stdout = stdout_backup
         result.append(captured_output.getvalue())
+
+    def test_colorize_result(self) -> None:
+        print(f'\n{inspect.currentframe().f_code.co_name}():')
+
+        colorizator = []
+        colorizator += ['\x1b[32mOK\x1b[0m']
+        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
+        colorizator += [None]
+        print('=' * 121)
+        for el in colorizator:
+            print(f'{repr(el) if el is not None else "None":<100} {el if el is not None else "None":<20}')
+        print('=' * 121)
+        self.assertEqual(colorizator,
+                         [colorize_result('OK'),
+                         colorize_result('FAIL: expected_1'),
+                         colorize_result(None)])
+        captured_output = io.StringIO()
+        stdout_backup = sys.stdout
+        sys.stdout = captured_output
+        #byte_string = colorize_result('OK').encode('utf-8')
+        print(colorize_result('OK'))
+        sys.stdout = stdout_backup
+        print(captured_output.getvalue())
+'''
+        def test_print_unknown_options(self) -> None:
+        print(f'\n{inspect.currentframe().f_code.co_name}():')
+        print_unknown_options(checklist: List[ChecklistObjType], parsed_options: Dict[str, str], opt_type: str)
 
     def test_simple_kconfig(self) -> None:
         # 1. prepare the checklist
@@ -556,3 +583,4 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
                  {'option_name': 'name_2', 'type': 'cmdline', 'desired_val': 'expected_2_new', 'decision': 'decision_2', 'reason': 'reason_2', 'check_result': 'OK', 'check_result_bool': True},
                  {'option_name': 'name_3', 'type': 'sysctl', 'desired_val': 'expected_3_new', 'decision': 'decision_3', 'reason': 'reason_3', 'check_result': 'OK', 'check_result_bool': True}]
         )
+'''

@@ -342,13 +342,14 @@ def main() -> None:
 
         # now everything is ready, perform the checks
         perform_checks(config_checklist)
-
         if mode == 'verbose':
             # print the parsed options without the checks (for debugging)
             print_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig')
             if args.cmdline:
+                print(config_checklist)
                 print_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline')
             if args.sysctl:
+                print(config_checklist)
                 print_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl')
 
         # finally print the results
@@ -380,7 +381,10 @@ def main() -> None:
 
         if mode == 'verbose':
             # print the parsed options without the checks (for debugging)
-            print_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl')
+            print('a'*100)
+            for o1 in config_checklist:
+                print(config_checklist)
+            #print_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl')
 
         # finally print the results
         print_checklist(mode, config_checklist, True)
