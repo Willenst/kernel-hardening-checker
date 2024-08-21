@@ -162,18 +162,20 @@ class TestEngine(unittest.TestCase):
     def test_colorize_result(self) -> None:
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = True
-        print(f'\n{inspect.currentframe().f_code.co_name}():')
+            if inspect.currentframe is not None:
+                print(f'\n{inspect.currentframe().f_code.co_name}():')
 
-        colorizator = []
-        colorizator += ['\x1b[32mOK\x1b[0m']
-        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
-        print('=' * 121)
-        for el in colorizator:
-            print(f'{repr(el):<100} {el:<20}')
-        print('=' * 121)
-        self.assertEqual(colorizator,
-                        [colorize_result('OK'),
-                        colorize_result('FAIL: expected_1')])
+
+            colorizator = []
+            colorizator += ['\x1b[32mOK\x1b[0m']
+            colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
+            print('=' * 121)
+            for el in colorizator:
+                print(f'{repr(el):<100} {el:<20}')
+            print('=' * 121)
+            self.assertEqual(colorizator,
+                            [colorize_result('OK'),
+                            colorize_result('FAIL: expected_1')])
 
     def test_simple_cmdline(self) -> None:
         # 1. prepare the checklist
