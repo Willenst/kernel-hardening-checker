@@ -17,8 +17,8 @@ import sys
 import json
 import inspect
 from typing import Union, Optional, List, Dict, Tuple
-from .engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
-from .engine import populate_with_data, perform_checks, override_expected_value, colorize_result
+from kernel_hardening_checker.engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
+from kernel_hardening_checker.engine import populate_with_data, perform_checks, override_expected_value, colorize_result
 
 
 ResultType = List[Union[Dict[str, StrOrBool], str]]
@@ -173,13 +173,6 @@ class TestEngine(unittest.TestCase):
                          [colorize_result('OK'),
                          colorize_result('FAIL: expected_1'),
                          colorize_result(None)])
-        captured_output = io.StringIO()
-        stdout_backup = sys.stdout
-        sys.stdout = captured_output
-        #byte_string = colorize_result('OK').encode('utf-8')
-        print(colorize_result('OK'))
-        sys.stdout = stdout_backup
-        print(captured_output.getvalue())
 
     def test_simple_cmdline(self) -> None:
         # 1. prepare the checklist
