@@ -162,8 +162,9 @@ class TestEngine(unittest.TestCase):
     def test_colorize_result(self) -> None:
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = True
-            if inspect.currentframe is not None:
-                print(f'\n{inspect.currentframe().f_code.co_name}():')
+            current_frame = inspect.currentframe()
+            if current_frame is not None:
+                print(f'\n{current_frame.f_code.co_name}():')
 
 
             colorizator = []
