@@ -2,7 +2,7 @@ name: engine unit-test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master, test, test2]
 
 jobs:
   engine_unit-test:
