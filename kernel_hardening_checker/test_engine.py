@@ -18,7 +18,7 @@ import json
 import inspect
 from typing import Union, Optional, List, Dict, Tuple
 from .engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
-from .engine import populate_with_data, perform_checks, override_expected_value
+from .engine import populate_with_data, perform_checks, override_expected_value, colorize_result
 
 
 ResultType = List[Union[Dict[str, StrOrBool], str]]
