@@ -12,6 +12,7 @@ This module performs unit-testing of the kernel-hardening-checker engine.
 # pylint: disable=missing-function-docstring,line-too-long
 
 import unittest
+from unittest import mock
 import io
 import sys
 import json
@@ -159,20 +160,22 @@ class TestEngine(unittest.TestCase):
         )
 
     def test_colorize_result(self) -> None:
-        print(f'\n{inspect.currentframe().f_code.co_name}():')
+        with mock.patch('sys.stdout') as stdout:
+            stdout.isatty.return_value = True
+            print(f'\n{inspect.currentframe().f_code.co_name}():')
 
-        colorizator = []
-        colorizator += ['\x1b[32mOK\x1b[0m']
-        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
-        colorizator += [None]
-        print('=' * 121)
-        for el in colorizator:
-            print(f'{repr(el) if el is not None else "None":<100} {el if el is not None else "None":<20}')
-        print('=' * 121)
-        self.assertEqual(colorizator,
-                         [colorize_result('OK'),
-                         colorize_result('FAIL: expected_1'),
-                         colorize_result(None)])
+            colorizator = []
+            colorizator += ['\x1b[32mOK\x1b[0m']
+            colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
+            colorizator += [None]
+            print('=' * 121)
+            for el in colorizator:
+                print(f'{repr(el) if el is not None else "None":<100} {el if el is not None else "None":<20}')
+            print('=' * 121)
+            self.assertEqual(colorizator,
+                            [colorize_result('OK'),
+                            colorize_result('FAIL: expected_1'),
+                            colorize_result(None)])
 
     def test_simple_cmdline(self) -> None:
         # 1. prepare the checklist
