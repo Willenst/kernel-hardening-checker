@@ -5,6 +5,9 @@ on:
     branches: [master, test, test2]
   pull_request:
     branches: [master, test, test2]
+  commit:
+    branches: [master, test, test2]
+
 
 jobs:
   functional_test_no-coverage:

@@ -3,6 +3,11 @@ name: engine unit-test
 on:
   push:
     branches: [master, test, test2]
+  pull_request:
+    branches: [master, test, test2]
+  commit:
+    branches: [master, test, test2]
+
 
 jobs:
   engine_unit-test:
