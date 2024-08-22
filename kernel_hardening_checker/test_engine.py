@@ -139,7 +139,7 @@ class TestEngine(unittest.TestCase):
         config_checklist += [CmdlineCheck('reason_2', 'decision_2', 'name_2', 'expected_2')]
 
         config_checklist += [SysctlCheck('reason_3', 'decision_3', 'name_3', 'expected_3')]
-        
+
         # 2. prepare parsed options
         parsed_kconfig_options  = {}
         parsed_cmdline_options  = {}
@@ -167,9 +167,9 @@ class TestEngine(unittest.TestCase):
 
         # 4. check that the results are correct
         self.assertEqual(
-            result, 
-            ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n', 
-             '[?] No check for cmdline option NOCHECK_name_2 (expected_2)\n', 
+            result,
+            ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n',
+             '[?] No check for cmdline option NOCHECK_name_2 (expected_2)\n',
              '[?] No check for sysctl option NOCHECK_name_3 (expected_3)\n'])
 
     def test_print_unknown_options_partially_complex(self) -> None:
@@ -182,10 +182,10 @@ class TestEngine(unittest.TestCase):
 
         config_checklist += [OR(CmdlineCheck('reason_3', 'decision_3', 'name_3', 'expected_3'),
              KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'))]
-        
+
         config_checklist += [OR(SysctlCheck('reason_5', 'decision_5', 'name_5', 'expected_5'),
              KconfigCheck('reason_6', 'decision_6', 'NAME_6', 'expected_6'))]
-        
+
         # 2. prepare parsed options
         parsed_kconfig_options  = {}
         parsed_cmdline_options  = {}
@@ -218,7 +218,7 @@ class TestEngine(unittest.TestCase):
         print('='*121)
         # 4. check that the results are correct
         self.assertEqual(
-            result, 
+            result,
             ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_2 (expected_2)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_4 (expected_4)\n'
@@ -239,11 +239,11 @@ class TestEngine(unittest.TestCase):
         config_checklist = [OR(KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'),
             AND(KconfigCheck('reason_5', 'decision_5', 'NAME_5', 'expected_5'),
                 VersionCheck((5, 9, 0))))]
-        
+
         config_checklist = [OR(CmdlineCheck('reason_6', 'decision_6', 'name_6', 'expected_6'),
             AND(SysctlCheck('reason_7', 'decision_7', 'name_7', 'expected_7'),
                 KconfigCheck('reason_8', 'decision_8', 'NAME_8', 'expected_8')))]
-        
+
         # 2. prepare parsed options
         parsed_kconfig_options  = {}
         parsed_cmdline_options  = {}
@@ -281,7 +281,7 @@ class TestEngine(unittest.TestCase):
 
         # 4. check that the results are correct
         self.assertEqual(
-            result, 
+            result,
             ['[?] No check for kconfig option CONFIG_NAME_1 (expected_1)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n'
              '[?] No check for kconfig option CONFIG_NAME_2 (expected_2)\n'
@@ -312,7 +312,7 @@ class TestEngine(unittest.TestCase):
         for el in nocolor:
             print(f'{repr(el):<100} {el:<20}')
         print(f'{"None":<101}{"None":<20}')
-        print('=' * 121)       
+        print('=' * 121)
         # 3. run and check that results are corrent with sys.stdout.isatty()=True option
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = True
@@ -326,7 +326,7 @@ class TestEngine(unittest.TestCase):
             self.assertEqual(nocolor,
                 [colorize_result('OK'),
                 colorize_result('FAIL: expected_1')])
-            
+
     def test_simple_kconfig(self) -> None:
         # 1. prepare the checklist
         config_checklist = [] # type: List[ChecklistObjType]
