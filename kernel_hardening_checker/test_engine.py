@@ -612,3 +612,58 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
             ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n',
              '[?] No check for cmdline option NOCHECK_name_2 (expected_2)\n',
              '[?] No check for sysctl option NOCHECK_name_3 (expected_3)\n'])
+
+    def test_print_unknown_options_complex(self) -> None:
+        self.function_printer()
+        # 1. prepare partially complex checklist
+        config_checklist = [] # type: List[ChecklistObjType]
+
+        config_checklist += [OR(KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1'),
+             KconfigCheck('reason_2', 'decision_2', 'NAME_2', 'expected_2'))]
+
+        config_checklist += [AND(CmdlineCheck('reason_3', 'decision_3', 'name_3', 'expected_3'),
+             KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'))]
+
+        config_checklist += [OR(SysctlCheck('reason_5', 'decision_5', 'name_5', 'expected_5'),
+             KconfigCheck('reason_6', 'decision_6', 'NAME_6', 'expected_6'))]
+
+        # 2. prepare parsed options
+        parsed_kconfig_options  = {}
+        parsed_cmdline_options  = {}
+        parsed_sysctl_options  = {}
+
+        parsed_kconfig_options['CONFIG_NAME_1'] = 'expected_1'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_1'] = 'expected_1'
+        parsed_kconfig_options['CONFIG_NAME_2'] = 'expected_2'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_2'] = 'expected_2'
+        parsed_kconfig_options['CONFIG_NAME_4'] = 'expected_4'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_4'] = 'expected_4'
+        parsed_kconfig_options['CONFIG_NAME_6'] = 'expected_6'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_6'] = 'expected_6'
+
+        parsed_cmdline_options['name_3'] = 'expected_2'
+        parsed_cmdline_options['NOCHECK_name_3'] = 'expected_2'
+
+        parsed_sysctl_options['name_5'] = 'expected_5'
+        parsed_sysctl_options['NOCHECK_name_5'] = 'expected_5'
+
+        # 3. run the print_unknown_options
+        result = [] # type: ResultType
+        self.get_print_unknown_options_result(config_checklist, parsed_kconfig_options, result,'kconfig')
+        self.get_print_unknown_options_result(config_checklist, parsed_cmdline_options, result,'cmdline')
+        self.get_print_unknown_options_result(config_checklist, parsed_sysctl_options, result,'sysctl')
+        print()
+        print('='*121)
+        for el in result:
+            print(el, end='')
+        print('='*121)
+        # 4. check that the results are correct
+        self.assertEqual(
+            result,
+            ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_2 (expected_2)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_4 (expected_4)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_6 (expected_6)\n', 
+             '[?] No check for cmdline option NOCHECK_name_3 (expected_2)\n', 
+             '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
+
