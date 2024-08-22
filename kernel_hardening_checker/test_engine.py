@@ -18,7 +18,7 @@ import json
 import inspect
 from typing import Union, Optional, List, Dict, Tuple
 from .engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
-from .engine import populate_with_data, perform_checks, override_expected_value
+from .engine import populate_with_data, perform_checks, override_expected_value, print_unknown_options
 
 
 ResultType = List[Union[Dict[str, StrOrBool], str]]
@@ -118,6 +118,15 @@ class TestEngine(unittest.TestCase):
     @staticmethod
     def function_printer() -> None:
         print(f'\n{inspect.stack()[1].function}():')
+
+    @staticmethod
+    def get_print_unknown_options_result(checklist: List[ChecklistObjType], parsed_options: Dict[str, str], result: ResultType, opt_type: str) -> None:
+        captured_output = io.StringIO()
+        stdout_backup = sys.stdout
+        sys.stdout = captured_output
+        print_unknown_options(checklist, parsed_options, opt_type)
+        sys.stdout = stdout_backup
+        result.append(captured_output.getvalue())
 
     def test_simple_kconfig(self) -> None:
         # 1. prepare the checklist
