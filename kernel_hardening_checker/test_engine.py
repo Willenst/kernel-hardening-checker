@@ -763,7 +763,7 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
             self.assertEqual(colorizator,
                             [colorize_result('OK'),
                             colorize_result('FAIL: expected_1')])
-            
+
         # 4. run and check that results are corrent without sys.stdout.isatty()=False option
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = False
