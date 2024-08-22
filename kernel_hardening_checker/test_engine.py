@@ -667,3 +667,71 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for cmdline option NOCHECK_name_3 (expected_2)\n', 
              '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
 
+    def test_print_unknown_options_complex_nested(self) -> None:
+        self.function_printer()
+        # 1. prepare partially complex checklist
+        config_checklist = [] # type: List[ChecklistObjType]
+
+        config_checklist = [OR(KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1'),
+            AND(KconfigCheck('reason_2', 'decision_2', 'NAME_2', 'expected_2'),
+                KconfigCheck('reason_3', 'decision_3', 'NAME_3', 'expected_3')))]
+
+        config_checklist = [OR(KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'),
+            AND(KconfigCheck('reason_5', 'decision_5', 'NAME_5', 'expected_5'),
+                VersionCheck((5, 9, 0))))]
+
+        config_checklist = [OR(CmdlineCheck('reason_6', 'decision_6', 'name_6', 'expected_6'),
+            AND(SysctlCheck('reason_7', 'decision_7', 'name_7', 'expected_7'),
+                KconfigCheck('reason_8', 'decision_8', 'NAME_8', 'expected_8')))]
+
+        # 2. prepare parsed options
+        parsed_kconfig_options  = {}
+        parsed_cmdline_options  = {}
+        parsed_sysctl_options  = {}
+
+        parsed_kconfig_options['CONFIG_NAME_1'] = 'expected_1'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_1'] = 'expected_1'
+        parsed_kconfig_options['CONFIG_NAME_2'] = 'expected_2'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_2'] = 'expected_2'
+        parsed_kconfig_options['CONFIG_NAME_3'] = 'expected_3'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_3'] = 'expected_3'
+        parsed_kconfig_options['CONFIG_NAME_4'] = 'expected_4'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_4'] = 'expected_4'
+        parsed_kconfig_options['CONFIG_NAME_5'] = 'expected_5'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_5'] = 'expected_5'
+        parsed_kconfig_options['CONFIG_NAME_8'] = 'expected_8'
+        parsed_kconfig_options['CONFIG_NOCHECK_NAME_8'] = 'expected_8'
+
+        parsed_cmdline_options['name_6'] = 'expected_6'
+        parsed_cmdline_options['NOCHECK_name_6'] = 'expected_6'
+
+        parsed_sysctl_options['name_7'] = 'expected_7'
+        parsed_sysctl_options['NOCHECK_name_7'] = 'expected_7'
+
+        # 3. run the print_unknown_options
+        result = [] # type: ResultType
+        self.get_print_unknown_options_result(config_checklist, parsed_kconfig_options, result,'kconfig')
+        self.get_print_unknown_options_result(config_checklist, parsed_cmdline_options, result,'cmdline')
+        self.get_print_unknown_options_result(config_checklist, parsed_sysctl_options, result,'sysctl')
+        print()
+        print('='*121)
+        for el in result:
+            print(el, end='')
+        print('='*121)
+
+        # 4. check that the results are correct
+        self.assertEqual(
+            result,
+            ['[?] No check for kconfig option CONFIG_NAME_1 (expected_1)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n'
+             '[?] No check for kconfig option CONFIG_NAME_2 (expected_2)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_2 (expected_2)\n'
+             '[?] No check for kconfig option CONFIG_NAME_3 (expected_3)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_3 (expected_3)\n'
+             '[?] No check for kconfig option CONFIG_NAME_4 (expected_4)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_4 (expected_4)\n'
+             '[?] No check for kconfig option CONFIG_NAME_5 (expected_5)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_5 (expected_5)\n'
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_8 (expected_8)\n', 
+             '[?] No check for cmdline option NOCHECK_name_6 (expected_6)\n', 
+             '[?] No check for sysctl option NOCHECK_name_7 (expected_7)\n'])
