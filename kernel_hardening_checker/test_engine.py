@@ -172,7 +172,7 @@ class TestEngine(unittest.TestCase):
              '[?] No check for cmdline option NOCHECK_name_2 (expected_2)\n',
              '[?] No check for sysctl option NOCHECK_name_3 (expected_3)\n'])
 
-    def test_print_unknown_options_partially_complex(self) -> None:
+    def test_print_unknown_options_complex(self) -> None:
         self.function_printer()
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
