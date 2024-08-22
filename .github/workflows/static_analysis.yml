@@ -2,9 +2,9 @@ name: static analysis
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test_CI ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, test_CI ]
 
 jobs:
   static_analysis:

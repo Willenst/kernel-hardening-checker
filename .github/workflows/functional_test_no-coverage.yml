@@ -2,9 +2,9 @@ name: functional test no coverage
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test_CI ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, test_CI ]
 
 jobs:
   functional_test_no-coverage:
