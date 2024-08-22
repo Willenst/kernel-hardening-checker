@@ -115,6 +115,10 @@ class TestEngine(unittest.TestCase):
         sys.stdout = stdout_backup
         result.append(captured_output.getvalue())
 
+    @staticmethod
+    def function_printer() -> None:
+        print(f'\n{inspect.stack()[1].function}():')
+
     def test_simple_kconfig(self) -> None:
         # 1. prepare the checklist
         config_checklist = [] # type: List[ChecklistObjType]
