@@ -12,13 +12,14 @@ This module performs unit-testing of the kernel-hardening-checker engine.
 # pylint: disable=missing-function-docstring,line-too-long
 
 import unittest
+from unittest import mock
 import io
 import sys
 import json
 import inspect
 from typing import Union, Optional, List, Dict, Tuple
 from .engine import StrOrBool, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
-from .engine import populate_with_data, perform_checks, override_expected_value, print_unknown_options
+from .engine import populate_with_data, perform_checks, override_expected_value, print_unknown_options, colorize_result
 
 
 ResultType = List[Union[Dict[str, StrOrBool], str]]
@@ -735,3 +736,38 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_8 (expected_8)\n', 
              '[?] No check for cmdline option NOCHECK_name_6 (expected_6)\n', 
              '[?] No check for sysctl option NOCHECK_name_7 (expected_7)\n'])
+
+    def test_colorize_result(self) -> None:
+        current_frame = inspect.currentframe()
+        if current_frame is not None:
+            print(f'\n{current_frame.f_code.co_name}():')
+
+        # 1. prepare the checklist
+        colorizator = ['\x1b[32mOK\x1b[0m']
+        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
+        nocolor = ['OK']
+        nocolor += ['FAIL: expected_1']
+
+        # 2. print the checklist
+        print('=' * 121)
+        for el in colorizator:
+            print(f'{repr(el):<100} {el:<20}')
+        for el in nocolor:
+            print(f'{repr(el):<100} {el:<20}')
+        print(f'{"None":<101}{"None":<20}')
+        print('=' * 121)
+
+        # 3. run and check that results are corrent with sys.stdout.isatty()=True option
+        with mock.patch('sys.stdout') as stdout:
+            stdout.isatty.return_value = True
+            self.assertEqual(colorizator,
+                            [colorize_result('OK'),
+                            colorize_result('FAIL: expected_1')])
+            
+        # 4. run and check that results are corrent without sys.stdout.isatty()=False option
+        with mock.patch('sys.stdout') as stdout:
+            stdout.isatty.return_value = False
+            self.assertEqual(None,colorize_result(None))
+            self.assertEqual(nocolor,
+                [colorize_result('OK'),
+                colorize_result('FAIL: expected_1')])
