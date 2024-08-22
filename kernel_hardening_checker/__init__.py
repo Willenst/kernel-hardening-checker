@@ -345,6 +345,7 @@ def main() -> None:
 
         if mode == 'verbose':
             # print the parsed options without the checks (for debugging)
+            #print(parsed_kconfig_options)
             print_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig')
             if args.cmdline:
                 print_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline')
