@@ -2,9 +2,9 @@ name: engine unit-test no coverage
 
 on:
   push:
-    branches: [ master ]
+    branches: [master, test, test2]
   pull_request:
-    branches: [ master ]
+    branches: [master, test, test2]
 
 jobs:
   engine_unit-test_no-coverage:

@@ -2,7 +2,7 @@ name: functional test
 
 on:
   push:
-    branches: [ master ]
+    branches: [master, test, test2]
 
 jobs:
   functional_test:

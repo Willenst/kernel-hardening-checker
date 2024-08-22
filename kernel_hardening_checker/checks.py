@@ -122,9 +122,6 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
         l += [KconfigCheck('self_protection', 'defconfig', 'RODATA_FULL_DEFAULT_ENABLED', 'y')]
         l += [KconfigCheck('self_protection', 'defconfig', 'ARM64_PTR_AUTH_KERNEL', 'y')]
         l += [KconfigCheck('self_protection', 'defconfig', 'ARM64_BTI_KERNEL', 'y')]
-        l += [KconfigCheck('self_protection', 'defconfig', 'ARM_SMMU', 'y')]
-        l += [KconfigCheck('self_protection', 'defconfig', 'ARM_SMMU_DISABLE_BYPASS_BY_DEFAULT', 'y')]
-        l += [KconfigCheck('self_protection', 'defconfig', 'ARM_SMMU_V3', 'y')]
         l += [KconfigCheck('self_protection', 'defconfig', 'MITIGATE_SPECTRE_BRANCH_HISTORY', 'y')]
         l += [KconfigCheck('self_protection', 'defconfig', 'ARM64_MTE', 'y')]
         l += [KconfigCheck('self_protection', 'defconfig', 'RANDOMIZE_MODULE_REGION_FULL', 'y')]
@@ -355,6 +352,7 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
 
     # 'cut_attack_surface', 'grsec'
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'ZSMALLOC_STAT', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'grsec', 'PAGE_OWNER', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'DEBUG_KMEMLEAK', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'BINFMT_AOUT', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'KPROBE_EVENTS', 'is not set')]
@@ -390,20 +388,6 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'KCOV', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'PROVIDE_OHCI1394_DMA_INIT', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'grsec', 'SUNRPC_DEBUG', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'X86_16BIT', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'BLK_DEV_UBLK', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'SMB_SERVER', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'XFS_ONLINE_SCRUB_STATS', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'CACHESTAT_SYSCALL', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'PREEMPTIRQ_TRACEPOINTS', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'ENABLE_DEFAULT_TRACERS', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'PROVE_LOCKING', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'TEST_DEBUG_VIRTUAL', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'MPTCP', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'TLS', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'TIPC', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'IP_SCTP', 'is not set')]
-    l += [KconfigCheck('cut_attack_surface', 'grsec', 'KGDB', 'is not set')]
     l += [AND(KconfigCheck('cut_attack_surface', 'grsec', 'PTDUMP_DEBUGFS', 'is not set'),
               KconfigCheck('cut_attack_surface', 'grsec', 'X86_PTDUMP', 'is not set'))]
 
@@ -437,9 +421,11 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'MMIOTRACE', 'is not set')] # refers to LOCKDOWN (permissive)
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'LIVEPATCH', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'IP_DCCP', 'is not set')]
+    l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'IP_SCTP', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'FTRACE', 'is not set')] # refers to LOCKDOWN
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'VIDEO_VIVID', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'INPUT_EVBUG', 'is not set')] # Can be used as a keylogger
+    l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'KGDB', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'CORESIGHT', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'XFS_SUPPORT_V4', 'is not set')]
     l += [KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'BLK_DEV_WRITE_MOUNTED', 'is not set')]
@@ -448,8 +434,6 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
                                             # dangerous, only for debugging the kernel hardening features!
     l += [OR(KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'TRIM_UNUSED_KSYMS', 'y'),
              modules_not_set)]
-    l += [AND(KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'ARM_PTDUMP_DEBUGFS', 'is not set'),
-              KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'ARM_PTDUMP', 'is not set'))]
 
     # 'harden_userspace'
     if arch == 'ARM64':
@@ -759,3 +743,5 @@ def add_sysctl_checks(l: List[ChecklistObjType], _arch: StrOrNone) -> None:
     l += [SysctlCheck('harden_userspace', 'kspp', 'fs.suid_dumpable', '0')]
     l += [SysctlCheck('harden_userspace', 'kspp', 'kernel.randomize_va_space', '2')]
     l += [SysctlCheck('harden_userspace', 'kspp', 'kernel.yama.ptrace_scope', '3')]
+    l += [OR(SysctlCheck('cut_attack_surface', 'kspp', 'kernel.io_uring_disabled', '2'),
+             KconfigCheck('cut_attack_surface', 'grsec', 'IO_URING', 'is not set'))]
