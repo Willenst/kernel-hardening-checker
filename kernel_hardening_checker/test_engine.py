@@ -227,7 +227,7 @@ class TestEngine(unittest.TestCase):
              '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
 
 
-    def test_print_unknown_options_full_complex(self) -> None:
+    def test_print_unknown_options_complex_nested(self) -> None:
         self.function_printer()
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
