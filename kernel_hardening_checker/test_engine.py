@@ -705,22 +705,22 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
 
     def test_colorize_result(self) -> None:
         # 1. prepare the checklists
-        colorizator = ['\x1b[32mOK\x1b[0m']
-        colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
-        nocolor = ['OK']
-        nocolor += ['FAIL: expected_1']
+        with_color = ['\x1b[32mOK\x1b[0m']
+        with_color += ['\x1b[31mFAIL: expected_1\x1b[0m']
+        no_color = ['OK']
+        no_color += ['FAIL: expected_1']
 
         # 2. run and check that results are correct with sys.stdout.isatty()=True
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = True
-            self.assertEqual(colorizator,
-                            [colorize_result('OK'),
-                            colorize_result('FAIL: expected_1')])
+            self.assertEqual(with_color,
+                             [colorize_result('OK'),
+                              colorize_result('FAIL: expected_1')])
 
         # 3. run and check that results are correct with sys.stdout.isatty()=False
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = False
-            self.assertEqual(None,colorize_result(None))
-            self.assertEqual(nocolor,
-                [colorize_result('OK'),
-                colorize_result('FAIL: expected_1')])
+            self.assertEqual(None, colorize_result(None))
+            self.assertEqual(no_color,
+                             [colorize_result('OK'),
+                              colorize_result('FAIL: expected_1')])
