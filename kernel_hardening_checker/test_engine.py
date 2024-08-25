@@ -704,20 +704,20 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for sysctl option NOCHECK_name_7 (expected_7)\n'])
 
     def test_colorize_result(self) -> None:
-        # 1. prepare the checklist
+        # 1. prepare the checklists
         colorizator = ['\x1b[32mOK\x1b[0m']
         colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
         nocolor = ['OK']
         nocolor += ['FAIL: expected_1']
 
-        # 3. run and check that results are corrent with sys.stdout.isatty()=True option
+        # 2. run and check that results are correct with sys.stdout.isatty()=True
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = True
             self.assertEqual(colorizator,
                             [colorize_result('OK'),
                             colorize_result('FAIL: expected_1')])
 
-        # 4. run and check that results are corrent without sys.stdout.isatty()=False option
+        # 3. run and check that results are correct with sys.stdout.isatty()=False
         with mock.patch('sys.stdout') as stdout:
             stdout.isatty.return_value = False
             self.assertEqual(None,colorize_result(None))
