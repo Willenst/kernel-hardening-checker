@@ -117,7 +117,7 @@ class TestEngine(unittest.TestCase):
         result.append(captured_output.getvalue())
 
     @staticmethod
-    def get_print_unknown_options_result(checklist: List[ChecklistObjType], parsed_options: Dict[str, str], result: ResultType, opt_type: str) -> None:
+    def get_unknown_options(checklist: List[ChecklistObjType], parsed_options: Dict[str, str], opt_type: str, result: ResultType) -> None:
         captured_output = io.StringIO()
         stdout_backup = sys.stdout
         sys.stdout = captured_output
@@ -593,9 +593,9 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
 
         # 3. run the print_unknown_options
         result = [] # type: ResultType
-        self.get_print_unknown_options_result(config_checklist, parsed_kconfig_options, result,'kconfig')
-        self.get_print_unknown_options_result(config_checklist, parsed_cmdline_options, result,'cmdline')
-        self.get_print_unknown_options_result(config_checklist, parsed_sysctl_options, result,'sysctl')
+        self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
+        self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
+        self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
         print()
         print('='*121)
         for el in result:
@@ -644,9 +644,9 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
 
         # 3. run the print_unknown_options
         result = [] # type: ResultType
-        self.get_print_unknown_options_result(config_checklist, parsed_kconfig_options, result,'kconfig')
-        self.get_print_unknown_options_result(config_checklist, parsed_cmdline_options, result,'cmdline')
-        self.get_print_unknown_options_result(config_checklist, parsed_sysctl_options, result,'sysctl')
+        self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
+        self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
+        self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
         print()
         print('='*121)
         for el in result:
@@ -704,9 +704,9 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
 
         # 3. run the print_unknown_options
         result = [] # type: ResultType
-        self.get_print_unknown_options_result(config_checklist, parsed_kconfig_options, result,'kconfig')
-        self.get_print_unknown_options_result(config_checklist, parsed_cmdline_options, result,'cmdline')
-        self.get_print_unknown_options_result(config_checklist, parsed_sysctl_options, result,'sysctl')
+        self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
+        self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
+        self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
         print()
         print('='*121)
         for el in result:
