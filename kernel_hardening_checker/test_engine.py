@@ -571,11 +571,8 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
     def test_print_unknown_options_simple(self) -> None:
         # 1. prepare simple checklist
         config_checklist = [] # type: List[ChecklistObjType]
-
         config_checklist += [KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1')]
-
         config_checklist += [CmdlineCheck('reason_2', 'decision_2', 'name_2', 'expected_2')]
-
         config_checklist += [SysctlCheck('reason_3', 'decision_3', 'name_3', 'expected_3')]
 
         # 2. prepare parsed options
@@ -608,15 +605,12 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
     def test_print_unknown_options_complex(self) -> None:
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
-
         config_checklist += [OR(KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1'),
-             KconfigCheck('reason_2', 'decision_2', 'NAME_2', 'expected_2'))]
-
+                                KconfigCheck('reason_2', 'decision_2', 'NAME_2', 'expected_2'))]
         config_checklist += [AND(CmdlineCheck('reason_3', 'decision_3', 'name_3', 'expected_3'),
-             KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'))]
-
+                                 KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'))]
         config_checklist += [OR(SysctlCheck('reason_5', 'decision_5', 'name_5', 'expected_5'),
-             KconfigCheck('reason_6', 'decision_6', 'NAME_6', 'expected_6'))]
+                                KconfigCheck('reason_6', 'decision_6', 'NAME_6', 'expected_6'))]
 
         # 2. prepare parsed options
         parsed_kconfig_options  = {}
@@ -650,22 +644,19 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
             ['[?] No check for kconfig option CONFIG_NOCHECK_NAME_1 (expected_1)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_2 (expected_2)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_4 (expected_4)\n'
-             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_6 (expected_6)\n', 
+             '[?] No check for kconfig option CONFIG_NOCHECK_NAME_6 (expected_6)\n',
              '[?] No check for cmdline option NOCHECK_name_3 (expected_2)\n', 
              '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
 
     def test_print_unknown_options_complex_nested(self) -> None:
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
-
         config_checklist = [OR(KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1'),
             AND(KconfigCheck('reason_2', 'decision_2', 'NAME_2', 'expected_2'),
                 KconfigCheck('reason_3', 'decision_3', 'NAME_3', 'expected_3')))]
-
         config_checklist = [OR(KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'),
             AND(KconfigCheck('reason_5', 'decision_5', 'NAME_5', 'expected_5'),
                 VersionCheck((5, 9, 0))))]
-
         config_checklist = [OR(CmdlineCheck('reason_6', 'decision_6', 'name_6', 'expected_6'),
             AND(SysctlCheck('reason_7', 'decision_7', 'name_7', 'expected_7'),
                 KconfigCheck('reason_8', 'decision_8', 'NAME_8', 'expected_8')))]
