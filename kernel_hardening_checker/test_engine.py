@@ -704,24 +704,11 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for sysctl option NOCHECK_name_7 (expected_7)\n'])
 
     def test_colorize_result(self) -> None:
-        current_frame = inspect.currentframe()
-        if current_frame is not None:
-            print(f'\n{current_frame.f_code.co_name}():')
-
         # 1. prepare the checklist
         colorizator = ['\x1b[32mOK\x1b[0m']
         colorizator += ['\x1b[31mFAIL: expected_1\x1b[0m']
         nocolor = ['OK']
         nocolor += ['FAIL: expected_1']
-
-        # 2. print the checklist
-        print('=' * 121)
-        for el in colorizator:
-            print(f'{repr(el):<100} {el:<20}')
-        for el in nocolor:
-            print(f'{repr(el):<100} {el:<20}')
-        print(f'{"None":<101}{"None":<20}')
-        print('=' * 121)
 
         # 3. run and check that results are corrent with sys.stdout.isatty()=True option
         with mock.patch('sys.stdout') as stdout:
