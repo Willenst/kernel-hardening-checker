@@ -117,10 +117,6 @@ class TestEngine(unittest.TestCase):
         result.append(captured_output.getvalue())
 
     @staticmethod
-    def function_printer() -> None:
-        print(f'\n{inspect.stack()[1].function}():')
-
-    @staticmethod
     def get_print_unknown_options_result(checklist: List[ChecklistObjType], parsed_options: Dict[str, str], result: ResultType, opt_type: str) -> None:
         captured_output = io.StringIO()
         stdout_backup = sys.stdout
@@ -572,7 +568,6 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
         )
 
     def test_print_unknown_options_simple(self) -> None:
-        self.function_printer()
         # 1. prepare simple checklist
         config_checklist = [] # type: List[ChecklistObjType]
 
@@ -615,7 +610,6 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for sysctl option NOCHECK_name_3 (expected_3)\n'])
 
     def test_print_unknown_options_complex(self) -> None:
-        self.function_printer()
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
 
@@ -669,7 +663,6 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
 
     def test_print_unknown_options_complex_nested(self) -> None:
-        self.function_printer()
         # 1. prepare partially complex checklist
         config_checklist = [] # type: List[ChecklistObjType]
 
