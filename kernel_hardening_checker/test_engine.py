@@ -626,8 +626,8 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
         parsed_kconfig_options['CONFIG_NAME_6'] = 'expected_6'
         parsed_kconfig_options['CONFIG_NOCHECK_NAME_6'] = 'expected_6'
 
-        parsed_cmdline_options['name_3'] = 'expected_2'
-        parsed_cmdline_options['NOCHECK_name_3'] = 'expected_2'
+        parsed_cmdline_options['name_3'] = 'expected_3'
+        parsed_cmdline_options['NOCHECK_name_3'] = 'expected_3'
 
         parsed_sysctl_options['name_5'] = 'expected_5'
         parsed_sysctl_options['NOCHECK_name_5'] = 'expected_5'
@@ -645,7 +645,7 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_2 (expected_2)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_4 (expected_4)\n'
              '[?] No check for kconfig option CONFIG_NOCHECK_NAME_6 (expected_6)\n',
-             '[?] No check for cmdline option NOCHECK_name_3 (expected_2)\n', 
+             '[?] No check for cmdline option NOCHECK_name_3 (expected_3)\n',
              '[?] No check for sysctl option NOCHECK_name_5 (expected_5)\n'])
 
     def test_print_unknown_options_complex_nested(self) -> None:
