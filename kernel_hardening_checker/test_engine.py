@@ -123,6 +123,7 @@ class TestEngine(unittest.TestCase):
         sys.stdout = captured_output
         print_unknown_options(checklist, parsed_options, opt_type)
         sys.stdout = stdout_backup
+        print(captured_output.getvalue(), end='')
         result.append(captured_output.getvalue())
 
     def test_simple_kconfig(self) -> None:
@@ -596,11 +597,6 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
         self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
         self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
         self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
-        print()
-        print('='*121)
-        for el in result:
-            print(el, end='')
-        print('='*121)
 
         # 4. check that the results are correct
         self.assertEqual(
@@ -647,11 +643,7 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
         self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
         self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
         self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
-        print()
-        print('='*121)
-        for el in result:
-            print(el, end='')
-        print('='*121)
+
         # 4. check that the results are correct
         self.assertEqual(
             result,
@@ -707,11 +699,6 @@ name_6                                  |sysctl | expected_6 |decision_6|     re
         self.get_unknown_options(config_checklist, parsed_kconfig_options, 'kconfig', result)
         self.get_unknown_options(config_checklist, parsed_cmdline_options, 'cmdline', result)
         self.get_unknown_options(config_checklist, parsed_sysctl_options, 'sysctl', result)
-        print()
-        print('='*121)
-        for el in result:
-            print(el, end='')
-        print('='*121)
 
         # 4. check that the results are correct
         self.assertEqual(
