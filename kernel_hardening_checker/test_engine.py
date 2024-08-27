@@ -80,21 +80,6 @@ class TestEngine(unittest.TestCase):
         # now everything is ready, perform the checks
         perform_checks(checklist)
 
-        # print the table with the results
-        print(f'\n{inspect.stack()[1].function}():')
-        print('=' * 121)
-        for opt in checklist:
-            opt.table_print('verbose', True) # verbose mode, with_results
-            print()
-            print('=' * 121)
-
-        # print the results in JSON
-        result = []
-        for opt in checklist:
-            result.append(opt.json_dump(True)) # with_results
-        print(json.dumps(result))
-        print()
-
     @staticmethod
     def get_engine_result(checklist: List[ChecklistObjType], result: ResultType, result_type: str) -> None:
         assert(result_type in ('json', 'stdout', 'stdout_verbose')), \
