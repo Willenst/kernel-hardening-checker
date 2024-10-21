@@ -102,7 +102,7 @@ cat /etc/sysctl.conf
 coverage run -a --branch bin/kernel-hardening-checker -s /etc/sysctl.conf
 
 echo ">>>>> test -v (kernel version detection) <<<<<"
-cp kernel_hardening_checker/config_files/distros/fedora_34.config ./test.config
+cp kernel_hardening_checker/config_files/distros/Fedora_39_Core_x86_64.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config -v /proc/version
 
 echo "Collect coverage for error handling"
