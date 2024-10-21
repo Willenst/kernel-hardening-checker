@@ -45,8 +45,8 @@ wget -O kernel_hardening_checker/config_files/distros/Alpinelinux_lts_x86-64.con
 wget -O kernel_hardening_checker/config_files/distros/Alpinelinux_lts_aarch64.config https://git.alpinelinux.org/aports/plain/main/linux-lts/lts.aarch64.config
 wget -O kernel_hardening_checker/config_files/distros/Clearlinux_x86-64.config https://raw.githubusercontent.com/clearlinux-pkgs/linux/master/config
 wget -O kernel_hardening_checker/config_files/distros/Clearlinux_x86-64.cmdline https://raw.githubusercontent.com/clearlinux-pkgs/linux/master/cmdline
-wget -O kernel_hardening_checker/config_files/distros/OpenSUSE_x86-64.config https://github.com/openSUSE/kernel-source/blob/master/config/x86_64/default
-wget -O kernel_hardening_checker/config_files/distros/OpenSUSE_aarch64.config https://github.com/openSUSE/kernel-source/blob/master/config/arm64/default
-wget -O kernel_hardening_checker/config_files/distros/SLE-15-SP7_x86-64.config https://github.com/openSUSE/kernel-source/blob/SLE15-SP7/config/x86_64/default
-wget -O kernel_hardening_checker/config_files/distros/SLE-15-SP7_aarch64.config https://github.com/openSUSE/kernel-source/blob/SLE15-SP7/config/arm64/default
+wget -O kernel_hardening_checker/config_files/distros/OpenSUSE_x86-64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/master/config/x86_64/default
+wget -O kernel_hardening_checker/config_files/distros/OpenSUSE_aarch64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/master/config/arm64/default
+wget -O kernel_hardening_checker/config_files/distros/SLE-15-SP7_x86-64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/SLE15-SP7/config/x86_64/default
+wget -O kernel_hardening_checker/config_files/distros/SLE-15-SP7_aarch64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/SLE15-SP7/config/x86_64/default
 wget -O kernel_hardening_checker/config_files/distros/Azure_linux_x86_64.config https://raw.githubusercontent.com/microsoft/azurelinux/refs/heads/1.0/SPECS/kernel/config
