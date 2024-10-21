@@ -48,7 +48,7 @@ cat ./cmdline_example
 sysctl -a > /tmp/sysctls
 CONFIG_DIR=`find . -name config_files`
 SYSCTL_EXAMPLE=$CONFIG_DIR/distros/example_sysctls.txt
-KCONFIGS=`find $CONFIG_DIR -type f | grep -e "\.config" -e "\.gz"
+KCONFIGS=`find $CONFIG_DIR -type f | grep -e "\.config" -e "\.gz"`
 COUNT=0
 for C in $KCONFIGS
 do
@@ -148,7 +148,7 @@ sed '3d' test.config > error.config
 coverage run -a --branch bin/kernel-hardening-checker -c error.config -v /proc/cmdline && exit 1
 
 echo ">>>>> no arch <<<<<"
-sed '305d' test.config > error.config
+sed '308d' test.config > error.config
 coverage run -a --branch bin/kernel-hardening-checker -c error.config && exit 1
 
 echo ">>>>> more than one arch <<<<<"
