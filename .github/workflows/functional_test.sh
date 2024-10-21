@@ -48,7 +48,7 @@ cat ./cmdline_example
 sysctl -a > /tmp/sysctls
 CONFIG_DIR=`find . -name config_files`
 SYSCTL_EXAMPLE=$CONFIG_DIR/distros/example_sysctls.txt
-KCONFIGS=`find $CONFIG_DIR -type f | grep -e "\.config" -e "\.gz"| grep -v "Alpine"` # The current Alpine kconfig does not contain a kernel version
+KCONFIGS=`find $CONFIG_DIR -type f | grep -e "\.config" -e "\.gz"
 COUNT=0
 for C in $KCONFIGS
 do

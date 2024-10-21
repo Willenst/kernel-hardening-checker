@@ -41,8 +41,6 @@ if [[ "$remove" == true ]]; then #debug
     exit 1
 fi
 
-wget -O kernel_hardening_checker/config_files/distros/Alpinelinux_lts_x86-64.config https://git.alpinelinux.org/aports/plain/main/linux-lts/lts.x86_64.config
-wget -O kernel_hardening_checker/config_files/distros/Alpinelinux_lts_aarch64.config https://git.alpinelinux.org/aports/plain/main/linux-lts/lts.aarch64.config
 wget -O kernel_hardening_checker/config_files/distros/Clearlinux_x86-64.config https://raw.githubusercontent.com/clearlinux-pkgs/linux/master/config
 wget -O kernel_hardening_checker/config_files/distros/Clearlinux_x86-64.cmdline https://raw.githubusercontent.com/clearlinux-pkgs/linux/master/cmdline
 wget -O kernel_hardening_checker/config_files/distros/OpenSUSE_x86-64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/master/config/x86_64/default
