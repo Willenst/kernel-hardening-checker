@@ -3,7 +3,7 @@
 oracle_git_url="https://raw.githubusercontent.com/oracle/kconfigs/refs/heads/gh-pages/out/"
 
 distros_from_oracle=(
-    "Android 14 (6.1) aarch64"
+    "Android 15 (6.6) aarch64"
     "Debian 13 Trixie aarch64"
     "Debian 13 Trixie x86_64"
     "CentOS Hyperscale 9 aarch64"
