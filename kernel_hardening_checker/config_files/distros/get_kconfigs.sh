@@ -1,6 +1,7 @@
 #!/bin/bash
 
 oracle_git_url="https://raw.githubusercontent.com/oracle/kconfigs/refs/heads/gh-pages/out/"
+arch_git_url="https://gitlab.archlinux.org/archlinux/packaging/packages/"
 
 distros_from_oracle=(
     "Android 15 (6.6) aarch64"
@@ -31,3 +32,5 @@ wget -O OpenSUSE_aarch64.config https://raw.githubusercontent.com/openSUSE/kerne
 wget -O SLE-15-SP7_x86-64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/SLE15-SP7/config/x86_64/default
 wget -O SLE-15-SP7_aarch64.config https://raw.githubusercontent.com/openSUSE/kernel-source/refs/heads/SLE15-SP7/config/arm64/default
 wget -O Azure_linux_x86_64.config https://raw.githubusercontent.com/microsoft/azurelinux/refs/heads/1.0/SPECS/kernel/config
+wget -O Archlinux-hardened_x86-64.config ${arch_git_url}linux-hardened/-/raw/main/config?ref_type=heads
+wget -O Archlinux-stable_x86-64.config ${arch_git_url}linux/-/raw/main/config?ref_type=heads
