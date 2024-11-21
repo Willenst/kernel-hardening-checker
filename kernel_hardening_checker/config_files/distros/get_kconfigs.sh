@@ -15,8 +15,6 @@ distros_from_oracle=(
     "Oracle Linux 9 (UEK-NEXT) x86_64"
     "Ubuntu 24.04 LTS Noble aarch64"
     "Ubuntu 24.04 LTS Noble x86_64"
-    "Upstream Default 6.6 aarch64"
-    "Upstream Default 6.6 x86_64"
 )
 
 for distro in "${distros_from_oracle[@]}"; do
