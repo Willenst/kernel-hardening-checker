@@ -667,6 +667,22 @@ def add_cmdline_checks(l: List[ChecklistObjType], arch: str) -> None:
     if arch in ('X86_64', 'X86_32'):
         l += [CmdlineCheck('self_protection', 'clipos', 'iommu', 'force')]
 
+    # 'self_protection', 'a13xp0p0v'
+    l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'lockdown', 'confidentiality'),
+             AND(KconfigCheck('self_protection', 'kspp', 'LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY', 'y'),
+                 CmdlineCheck('self_protection', 'a13xp0p0v', 'lockdown', 'is not set')))]
+    l += [OR(CmdlineCheck('self_protectioыn', 'a13xp0p0v', 'module.sig_enforce', '1'),
+             AND(KconfigCheck('self_protection', 'kspp', 'MODULE_SIG_FORCE', 'y'),
+                 CmdlineCheck('self_protection', 'a13xp0p0v', 'module.sig_enforce', 'is not set')))]
+    if arch in ('X86_64', 'X86_32'):
+        l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'intel_iommu', 'on'),
+                 AND(KconfigCheck('self_protection', 'kspp', 'INTEL_IOMMU_DEFAULT_ON', 'y'),
+                     CmdlineCheck('self_protection', 'a13xp0p0v', 'intel_iommu', 'is not set')))]
+    if arch == 'ARM64':
+        l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'rodata', 'full'),
+                 AND(KconfigCheck('self_protection', 'defconfig', 'RODATA_FULL_DEFAULT_ENABLED', 'y'),
+                     CmdlineCheck('self_protection', 'a13xp0p0v', 'rodata', 'is not set')))]
+
     # 'cut_attack_surface', 'defconfig'
     if arch in ('X86_64', 'X86_32'):
         tsx_not_set = CmdlineCheck('cut_attack_surface', 'defconfig', 'tsx', 'is not set')
