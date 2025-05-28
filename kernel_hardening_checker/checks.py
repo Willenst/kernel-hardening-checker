@@ -663,6 +663,22 @@ def add_cmdline_checks(l: List[ChecklistObjType], arch: str) -> None:
                      KconfigCheck('self_protection', 'a13xp0p0v', 'CFI_AUTO_DEFAULT', 'is present'),
                      CmdlineCheck('self_protection', 'kspp', 'cfi', 'is not set')))]
 
+    # 'self_protection', 'a13xp0p0v'
+    l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'lockdown', 'confidentiality'),
+             AND(KconfigCheck('self_protection', 'kspp', 'LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY', 'y'),
+                 CmdlineCheck('self_protection', 'a13xp0p0v', 'lockdown', 'is not set')))]
+    l += [OR(CmdlineCheck('self_protectioыn', 'a13xp0p0v', 'module.sig_enforce', '1'),
+             AND(KconfigCheck('self_protection', 'kspp', 'MODULE_SIG_FORCE', 'y'),
+                 CmdlineCheck('self_protection', 'a13xp0p0v', 'module.sig_enforce', 'is not set')))]
+    if arch == 'X86_64':
+        l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'intel_iommu', 'on'),
+                AND(KconfigCheck('self_protection', 'kspp', 'INTEL_IOMMU_DEFAULT_ON', 'y'),
+                    CmdlineCheck('self_protection', 'a13xp0p0v', 'intel_iommu', 'is not set')))]
+    if arch == 'ARM64':
+        l += [OR(CmdlineCheck('self_protection', 'a13xp0p0v', 'rodata', 'full'),
+                 AND(KconfigCheck('self_protection', 'defconfig', 'RODATA_FULL_DEFAULT_ENABLED', 'y'),
+                     CmdlineCheck('self_protection', 'a13xp0p0v', 'rodata', 'is not set')))]
+
     # 'self_protection', 'clipos'
     if arch in ('X86_64', 'X86_32'):
         l += [CmdlineCheck('self_protection', 'clipos', 'iommu', 'force')]
