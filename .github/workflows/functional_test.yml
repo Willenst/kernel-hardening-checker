@@ -51,6 +51,7 @@ jobs:
 
     - name: Commit and push coverage report
       run: |
-        git add coverage.xml htmlcov/
+        git add .
+        git add -f coverage.xml htmlcov/
         git commit -m "Add coverage report"
         git push
