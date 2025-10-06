@@ -1,7 +1,7 @@
 name: functional test
 
 permissions:
-  contents: read
+  contents: write
 
 on:
   push:
@@ -39,3 +39,18 @@ jobs:
     - name: Prepare the final coverage report
       run: |
         coverage xml -i -o coverage.xml
+    - name: Generate HTML coverage report
+      run: |
+        coverage html -d coverage-report
+
+    - name: Setup Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Commit and push coverage report
+      run: |
+        git checkout -b coverage-report
+        git add coverage-report/
+        git commit -m "Add coverage report"
+        git push origin coverage-report --force

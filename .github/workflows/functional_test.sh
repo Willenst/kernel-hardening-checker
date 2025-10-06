@@ -271,4 +271,7 @@ sudo mv /sbin/sysctl /sbin/sysctl.bak
 $COVER run -a --branch bin/kernel-hardening-checker -a && exit 1
 sudo mv /sbin/sysctl.bak /sbin/sysctl
 
+
+script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
+
 echo "The end of the functional tests"
