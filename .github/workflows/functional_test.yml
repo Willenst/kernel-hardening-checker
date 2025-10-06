@@ -50,7 +50,6 @@ jobs:
 
     - name: Commit and push coverage report
       run: |
-        git checkout -b coverage-report
-        git add coverage-report/
+        git add .
         git commit -m "Add coverage report"
         git push origin coverage-report --force
