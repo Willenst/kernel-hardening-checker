@@ -280,7 +280,7 @@ cat <<'EOF' >> kernel_hardening_checker/checks.py
              KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
 EOF
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config2 -s sysctltest
-mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py.bak
+mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
 
 
 #script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
