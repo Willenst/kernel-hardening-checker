@@ -50,3 +50,4 @@ jobs:
         name: functional_test_upload
         fail_ci_if_error: true
         verbose: true
+        create-commit: false
