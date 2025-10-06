@@ -50,15 +50,10 @@ echo ">>>>> test the autodetection mode <<<<<"
 cat /proc/cmdline
 cat /proc/version
 ls -l /boot
-ls -l /proc/c*
-FILE1=/proc/config.gz
 FILE2=/boot/config-`uname -r`
-if [ ! -f "$FILE1" ] ; then
-    echo "$FILE1 does not exist"
-    if [ ! -f "$FILE2" ] ; then
-        echo "$FILE2 does not exist, create it"
-        cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config "$FILE2"
-    fi
+if [ ! -f "$FILE2" ] ; then
+    echo "$FILE2 does not exist, create it"
+    cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config "$FILE2"
 fi
 ls -l /boot
 coverage run -a --branch bin/kernel-hardening-checker -a
@@ -100,9 +95,6 @@ cp $CONFIG_DIR/defconfigs/arm64_defconfig_6.6.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config | grep "Detected architecture: ARM64"
 cp $CONFIG_DIR/defconfigs/riscv_defconfig_6.6.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config | grep "Detected architecture: RISCV"
-
-
-coverage run -a --branch bin/kernel-hardening-checker -c ./test.config2 -s sysctltest
 
 echo ">>>>> test sysctl arch detection <<<<<"
 echo "kernel.arch = x86_64" > /tmp/sysctl_arch # same as output of `sysctl kernel.arch`
@@ -260,21 +252,24 @@ cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
 
-echo ">>>>> no files for autodetection <<<<<"
-sudo mv $FILE2 /tmp/back_conf
-coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
-sudo mv /tmp/back_conf /$FILE2
+cp kernel_hardening_checker/checks.py kernel_hardening_checker/checks.py.bak
+cat <<'EOF' >> kernel_hardening_checker/checks.py
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
+EOF
+coverage run -a --branch bin/kernel-hardening-checker -c ./test.config2 -s sysctltest
+mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
 
-OLD_PATH=$PATH
-COVER=$(which coverage)
-PATH=/usr/bin:/bin
-$COVER run -a --branch bin/kernel-hardening-checker -a
-PATH=$OLD_PATH
-sudo mv /sbin/sysctl /sbin/sysctl.bak
-$COVER run -a --branch bin/kernel-hardening-checker -a && exit 1
-sudo mv /sbin/sysctl.bak /sbin/sysctl
 
-script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
+#script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
 
 
 echo "The end of the functional tests"

@@ -35,6 +35,7 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
     modules_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'MODULES', 'is not set') # radical, but may be useful in some cases
     devmem_not_set = KconfigCheck('cut_attack_surface', 'kspp', 'DEVMEM', 'is not set') # refers to LOCKDOWN
     bpf_syscall_not_set = KconfigCheck('cut_attack_surface', 'lockdown', 'BPF_SYSCALL', 'is not set') # refers to LOCKDOWN
+
     # 'self_protection', 'defconfig'
     l += [KconfigCheck('self_protection', 'defconfig', 'BUG', 'y')]
     l += [KconfigCheck('self_protection', 'defconfig', 'SLUB_DEBUG', 'y')]
@@ -922,15 +923,4 @@ def add_sysctl_checks(l: List[ChecklistObjType], arch: StrOrNone) -> None:
     l += [SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_bits', 'MAX')]
           # 'MAX' value is refined using ARCH_MMAP_RND_BITS_MAX
     l += [SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_compat_bits', 'MAX')]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
-
           # 'MAX' value is refined using ARCH_MMAP_RND_COMPAT_BITS_MAX
