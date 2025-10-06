@@ -924,3 +924,33 @@ def add_sysctl_checks(l: List[ChecklistObjType], arch: StrOrNone) -> None:
           # 'MAX' value is refined using ARCH_MMAP_RND_BITS_MAX
     l += [SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_compat_bits', 'MAX')]
           # 'MAX' value is refined using ARCH_MMAP_RND_COMPAT_BITS_MAX
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]

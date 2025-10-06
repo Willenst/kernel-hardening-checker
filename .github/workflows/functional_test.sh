@@ -129,6 +129,45 @@ coverage run -a --branch bin/kernel-hardening-checker -c ./test.config -v /proc/
 
 echo "Collect coverage for error handling"
 
+echo ">>>>> no sysctl in PATH (simulate Debian error) <<<<<"
+OLD_PATH=$PATH
+COVER=$(which coverage)
+PATH=/usr/bin:/bin
+$COVER run -a --branch bin/kernel-hardening-checker -a
+PATH=$OLD_PATH
+
+echo ">>>>> extra diffent checks <<<<<"
+cp kernel_hardening_checker/checks.py kernel_hardening_checker/checks.py.bak
+cp test.config extra.config
+cp test.config extra.config
+cat <<'EOF' >> extra.config
+CONFIG_TEST_1=y
+CONFIG_TEST_2=y
+CONFIG_TEST_3=y
+CONFIG_TEST_4=y
+EOF
+cp $SYSCTL_EXAMPLE sysctl.extra
+cat <<'EOF' >> sysctl.extra
+#commented_line
+testval2 = 0
+testval3 = "catchme"
+EOF
+# At the moment, hardening-checker allows for more variations of options than it already has, so we need to add a few for tests.
+cat <<'EOF' >> kernel_hardening_checker/checks.py
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
+    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
+              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
+    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
+             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
+EOF
+coverage run -a --branch bin/kernel-hardening-checker -c ./extra.config -s sysctl.extra
+mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
+
 echo ">>>>> -a and any config args together <<<<<"
 coverage run -a --branch bin/kernel-hardening-checker -a -c ./test.config && exit 1
 coverage run -a --branch bin/kernel-hardening-checker -a -l /proc/cmdline && exit 1
@@ -252,38 +291,16 @@ cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
 
-echo ">>>>> SLAVIKTESTS <<<<<"
+echo ">>>>> no kconfig for autodetection <<<<<"
 sudo mv $FILE2 /tmp/back_conf
 coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
 sudo mv /tmp/back_conf /$FILE2
 
-OLD_PATH=$PATH
-COVER=$(which coverage)
-PATH=/usr/bin:/bin
-$COVER run -a --branch bin/kernel-hardening-checker -a
-PATH=$OLD_PATH
+echo ">>>>> broken sysctl binary <<<<<"
 sudo mv /sbin/sysctl /sbin/sysctl.bak
-$COVER run -a --branch bin/kernel-hardening-checker -a && exit 1
+coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+sudo bash -c 'echo -e "#!/bin/bash\nexit 1" > /sbin/sysctl; chmod +x /sbin/sysctl'
+coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
 sudo mv /sbin/sysctl.bak /sbin/sysctl
-
-cp kernel_hardening_checker/checks.py kernel_hardening_checker/checks.py.bak
-cat <<'EOF' >> kernel_hardening_checker/checks.py
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
-EOF
-coverage run -a --branch bin/kernel-hardening-checker -c ./test.config2 -s sysctltest
-mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
-
-
-#script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
-
 
 echo "The end of the functional tests"
