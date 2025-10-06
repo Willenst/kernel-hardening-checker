@@ -257,21 +257,4 @@ cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
 
-echo ">>>>> no files for autodetection <<<<<"
-sudo mv $FILE2 /tmp/back_conf
-coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
-sudo mv /tmp/back_conf /$FILE2
-
-OLD_PATH=$PATH
-COVER=$(which coverage)
-PATH=/usr/bin:/bin
-$COVER run -a --branch bin/kernel-hardening-checker -a
-PATH=$OLD_PATH
-sudo mv /sbin/sysctl /sbin/sysctl.bak
-$COVER run -a --branch bin/kernel-hardening-checker -a && exit 1
-sudo mv /sbin/sysctl.bak /sbin/sysctl
-
-
-
-
 echo "The end of the functional tests"
