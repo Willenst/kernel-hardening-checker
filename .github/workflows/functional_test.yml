@@ -1,0 +1,57 @@
+name: functional test
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches: [ test ]
+
+jobs:
+  functional_test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        python-version: ['3.12']
+
+    steps:
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Get the source code
+      uses: actions/checkout@v4
+
+    - name: Install coverage
+      run: |
+        python3 -m pip install --upgrade pip
+        python3 -m pip install coverage
+
+    - name: Run the functional tests and collect coverage
+      run: |
+        sh .github/workflows/functional_test.sh
+
+    - name: Prepare the final coverage report
+      run: |
+        coverage xml -i -o coverage.xml
+
+    - name: Generate HTML coverage report
+      run: |
+        coverage html
+
+    - name: Setup Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Commit and push coverage report
+      run: |
+        git add .
+        git add -f coverage.xml htmlcov/
+        git commit -m "Add coverage report"
+        git push
