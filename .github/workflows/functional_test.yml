@@ -39,9 +39,10 @@ jobs:
     - name: Prepare the final coverage report
       run: |
         coverage xml -i -o coverage.xml
+
     - name: Generate HTML coverage report
       run: |
-        coverage html -i -o coverage.html
+        coverage html
 
     - name: Setup Git
       run: |
@@ -50,6 +51,6 @@ jobs:
 
     - name: Commit and push coverage report
       run: |
-        git add .
+        git add coverage.xml htmlcov/
         git commit -m "Add coverage report"
         git push
