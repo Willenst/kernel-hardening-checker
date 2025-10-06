@@ -41,7 +41,7 @@ jobs:
         coverage xml -i -o coverage.xml
     - name: Generate HTML coverage report
       run: |
-        coverage html
+        coverage html -i -o coverage.html
 
     - name: Setup Git
       run: |
