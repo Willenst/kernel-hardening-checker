@@ -252,6 +252,20 @@ cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
 
+echo ">>>>> SLAVIKTESTS <<<<<"
+sudo mv $FILE2 /tmp/back_conf
+coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+sudo mv /tmp/back_conf /$FILE2
+
+OLD_PATH=$PATH
+COVER=$(which coverage)
+PATH=/usr/bin:/bin
+$COVER run -a --branch bin/kernel-hardening-checker -a
+PATH=$OLD_PATH
+sudo mv /sbin/sysctl /sbin/sysctl.bak
+$COVER run -a --branch bin/kernel-hardening-checker -a && exit 1
+sudo mv /sbin/sysctl.bak /sbin/sysctl
+
 cp kernel_hardening_checker/checks.py kernel_hardening_checker/checks.py.bak
 cat <<'EOF' >> kernel_hardening_checker/checks.py
     l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
@@ -266,7 +280,7 @@ cat <<'EOF' >> kernel_hardening_checker/checks.py
              KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
 EOF
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config2 -s sysctltest
-mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
+mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py.bak
 
 
 #script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null
