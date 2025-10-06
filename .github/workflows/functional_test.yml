@@ -5,13 +5,10 @@ permissions:
 
 on:
   push:
-    branches: [ master ]
+    branches: [ test ]
 
 jobs:
   functional_test:
-
-    if: github.repository == 'a13xp0p0v/kernel-hardening-checker'
-
     runs-on: ubuntu-latest
 
     strategy:
