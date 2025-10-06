@@ -57,6 +57,7 @@ if [ ! -f "$FILE2" ] ; then
 fi
 ls -l /boot
 coverage run -a --branch bin/kernel-hardening-checker -a
+script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null # emulate tty for colorize_result() coverage
 coverage run -a --branch bin/kernel-hardening-checker -a -m verbose
 coverage run -a --branch bin/kernel-hardening-checker -a -m json
 coverage run -a --branch bin/kernel-hardening-checker -a -m show_ok
