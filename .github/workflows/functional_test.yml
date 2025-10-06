@@ -39,15 +39,3 @@ jobs:
     - name: Prepare the final coverage report
       run: |
         coverage xml -i -o coverage.xml
-
-    - name: Handle coverage
-      uses: codecov/codecov-action@v4
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      with:
-        files: ./coverage.xml
-        flags: functional_test
-        name: functional_test_upload
-        fail_ci_if_error: true
-        verbose: true
-        commit: false
