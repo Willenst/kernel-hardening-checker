@@ -290,6 +290,7 @@ class OR(ComplexOptCheck):
                                f'unexpected VersionCheck result {opt.result}'
                         # VersionCheck provides enough info, nothing to add
                     else:
+                        print(opt.result)
                         if opt.result == 'OK':
                             self.result = f'OK: {opt.name} is "{opt.expected}"'
                         elif opt.result.startswith('OK: in \"'):
@@ -316,9 +317,6 @@ class AND(ComplexOptCheck):
         for i, opt in reversed(list(enumerate(self.opts))):
             opt.check()
             assert(opt.result), 'unexpected empty result of the AND sub-check'
-            if i == 0:
-                self.result = opt.result
-                return
             if not opt.result.startswith('OK'):
                 # This FAIL is caused by additional checks,
                 # and not by the main option that this AND-check is about.
@@ -341,6 +339,8 @@ class AND(ComplexOptCheck):
                                f'unexpected FAIL description "{opt.result}"'
                         self.result = f'FAIL: {opt.name} is off, not found'
                 return
+        self.result = opt.result
+        return
 
 
 # All classes are declared, let's define typing:
