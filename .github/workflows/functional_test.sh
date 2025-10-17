@@ -267,4 +267,11 @@ cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
 
+echo ">>>>> broken sysctl binary <<<<<"
+sudo mv /sbin/sysctl /sbin/sysctl.bak
+coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+sudo bash -c 'echo -e "#!/bin/bash\nexit 1" > /sbin/sysctl; chmod +x /sbin/sysctl'
+coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+sudo mv /sbin/sysctl.bak /sbin/sysctl
+
 echo "The end of the functional tests"
