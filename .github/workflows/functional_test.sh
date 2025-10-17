@@ -89,6 +89,10 @@ do
 done
 echo "\n>>>>> have checked $COUNT kconfigs <<<<<"
 
+echo ">>>>> test colorizing results via terminal emulation <<<<<"
+cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
+script -q -c "coverage run -a --branch bin/kernel-hardening-checker -c ./test.config" /dev/null # emulate tty for colorize_result() coverage
+
 echo ">>>>> test kconfig arch detection <<<<<"
 cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config | grep "Detected architecture: X86_64"
