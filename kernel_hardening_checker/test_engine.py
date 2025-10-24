@@ -531,6 +531,10 @@ kernel version >= (42, 43, 44)                                                  
         config_checklist += [KconfigCheck('reason_1', 'decision_1', 'NAME_1', 'expected_1')]
         config_checklist += [CmdlineCheck('reason_2', 'decision_2', 'name_2', 'expected_2')]
         config_checklist += [SysctlCheck('reason_3', 'decision_3', 'name_3', 'expected_3')]
+        config_checklist += [OR(KconfigCheck('reason_4', 'decision_4', 'NAME_4', 'expected_4'),
+                                KconfigCheck('reason_5', 'decision_5', 'NAME_5', 'expected_5'))]
+        config_checklist += [AND(KconfigCheck('reason_6', 'decision_6', 'NAME_6', 'expected_6'),
+                                 KconfigCheck('reason_7', 'decision_7', 'NAME_7', 'expected_7'))]
 
         # 2. prepare the parsed kconfig options
         parsed_kconfig_options  = {}
@@ -544,35 +548,31 @@ kernel version >= (42, 43, 44)                                                  
         parsed_sysctl_options  = {}
         parsed_sysctl_options['name_3'] = 'expected_3_new'
 
-        # 5. run the engine
+        # 5. prepare the parsed OR kconfig options
+        parsed_kconfig_options['CONFIG_NAME_4'] = 'expected_4_new'
+        parsed_kconfig_options['CONFIG_NAME_5'] = 'expected_5_new'
+
+        # 6. prepare the parsed AND kconfig options
+        parsed_kconfig_options['CONFIG_NAME_6'] = 'expected_6_new'
+        parsed_kconfig_options['CONFIG_NAME_7'] = 'expected_7_new'
+
+        # 7. run the engine
         self.run_engine(config_checklist, parsed_kconfig_options, parsed_cmdline_options, parsed_sysctl_options, None)
 
-        # 6. check that the results are correct
+        # 8. check that the results are correct
         result = [] # type: ResultType
         self.get_engine_result(config_checklist, result, 'json')
         self.assertEqual(
                 result,
                 [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1', 'check_result': 'FAIL: "expected_1_new"', 'check_result_bool': False},
                  {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2', 'check_result': 'FAIL: "expected_2_new"', 'check_result_bool': False},
-                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False}]
-        )
-
-        # 7. override expected value and perform the checks again
-        override_expected_value(config_checklist, 'CONFIG_NAME_1', 'expected_1_new')
-        perform_checks(config_checklist)
-
-        # 8. check that the results are correct
-        result = []
-        self.get_engine_result(config_checklist, result, 'json')
-        self.assertEqual(
-                result,
-                [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
-                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2', 'check_result': 'FAIL: "expected_2_new"', 'check_result_bool': False},
-                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False}]
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'FAIL: "expected_4_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
         )
 
         # 9. override expected value and perform the checks again
-        override_expected_value(config_checklist, 'name_2', 'expected_2_new')
+        override_expected_value(config_checklist, 'CONFIG_NAME_1', 'expected_1_new')
         perform_checks(config_checklist)
 
         # 10. check that the results are correct
@@ -581,12 +581,14 @@ kernel version >= (42, 43, 44)                                                  
         self.assertEqual(
                 result,
                 [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
-                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
-                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False}]
+                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2', 'check_result': 'FAIL: "expected_2_new"', 'check_result_bool': False},
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'FAIL: "expected_4_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
         )
 
         # 11. override expected value and perform the checks again
-        override_expected_value(config_checklist, 'name_3', 'expected_3_new')
+        override_expected_value(config_checklist, 'name_2', 'expected_2_new')
         perform_checks(config_checklist)
 
         # 12. check that the results are correct
@@ -596,7 +598,77 @@ kernel version >= (42, 43, 44)                                                  
                 result,
                 [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
                  {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
-                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3_new', 'check_result': 'OK', 'check_result_bool': True}]
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3', 'check_result': 'FAIL: "expected_3_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'FAIL: "expected_4_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
+        )
+
+        # 13. override expected value and perform the checks again
+        override_expected_value(config_checklist, 'name_3', 'expected_3_new')
+        perform_checks(config_checklist)
+
+        # 14. check that the results are correct
+        result = []
+        self.get_engine_result(config_checklist, result, 'json')
+        self.assertEqual(
+                result,
+                [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'FAIL: "expected_4_new"', 'check_result_bool': False},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
+        )
+
+        # 15. override expected value and perform the checks again
+        override_expected_value(config_checklist, 'CONFIG_NAME_4', 'expected_4_new')
+        perform_checks(config_checklist)
+
+        # 16. check that the results are correct
+        result = []
+        self.get_engine_result(config_checklist, result, 'json')
+        self.assertEqual(
+                result,
+                [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
+        )
+
+        # 17. override expected value and perform the checks again
+        override_expected_value(config_checklist, 'CONFIG_NAME_4', 'expected_4') # rever the value back to check if we could ovveride second one
+        override_expected_value(config_checklist, 'CONFIG_NAME_5', 'expected_5_new')
+        perform_checks(config_checklist)
+
+        # 18. check that the results are correct
+        result = []
+        self.get_engine_result(config_checklist, result, 'json')
+        self.assertEqual(
+                result,
+                [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'OK: CONFIG_NAME_5 is "expected_5_new"', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6', 'check_result': 'FAIL: CONFIG_NAME_7 is not "expected_7"', 'check_result_bool': False}]
+        )
+        # 19. override expected value and perform the checks again
+        override_expected_value(config_checklist, 'CONFIG_NAME_6', 'expected_6_new')
+        override_expected_value(config_checklist, 'CONFIG_NAME_7', 'expected_7_new')
+        perform_checks(config_checklist)
+
+        # 20. check that the results are correct
+        result = []
+        self.get_engine_result(config_checklist, result, 'json')
+        print('\n'*5)
+        print(result)
+        print('\n'*5) 
+        self.assertEqual(
+                result,
+                [{'option_name': 'CONFIG_NAME_1', 'type': 'kconfig', 'reason': 'reason_1', 'decision': 'decision_1', 'desired_val': 'expected_1_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_2', 'type': 'cmdline', 'reason': 'reason_2', 'decision': 'decision_2', 'desired_val': 'expected_2_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'name_3', 'type': 'sysctl', 'reason': 'reason_3', 'decision': 'decision_3', 'desired_val': 'expected_3_new', 'check_result': 'OK', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_4', 'type': 'kconfig', 'reason': 'reason_4', 'decision': 'decision_4', 'desired_val': 'expected_4', 'check_result': 'OK: CONFIG_NAME_5 is "expected_5_new"', 'check_result_bool': True},
+                 {'option_name': 'CONFIG_NAME_6', 'type': 'kconfig', 'reason': 'reason_6', 'decision': 'decision_6', 'desired_val': 'expected_6_new', 'check_result': 'OK', 'check_result_bool': True}]
         )
 
     def test_print_unknown_options_simple(self) -> None:
