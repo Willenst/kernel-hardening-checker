@@ -15,7 +15,7 @@ This module is the engine of checks.
 from __future__ import annotations
 import sys
 
-from typing import Union, Optional, List, Dict, Tuple
+from typing import Union, Optional, List, Dict, Tuple, cast
 StrOrNone = Optional[str]
 TupleOrNone = Optional[Tuple[int, ...]]
 DictOrTuple = Union[Dict[str, str], Tuple[int, ...]]
@@ -410,15 +410,11 @@ def populate_with_data(checklist: List[ChecklistObjType], data: DictOrTuple, dat
 
 def override_expected_value(checklist: List[ChecklistObjType], name: str, new_val: str) -> None:
     for opt in checklist:
-        if opt.name == name:
-            if isinstance(opt, SimpleNamedOptCheckTypes):
+        if isinstance(opt, SimpleNamedOptCheckTypes):
+            if opt.name == name:
                 opt.expected = new_val
-            else:
-                for o in opt.opts:
-                    assert(isinstance(o, SimpleNamedOptCheckTypes)), \
-                           f'overriding an expected value for "{o}" is not supported yet'
-                    if o.name == name:
-                        o.expected = new_val
+        elif isinstance(opt, ComplexOptCheckTypes):  # Try to decompose complex checks
+            override_expected_value(cast(List[ChecklistObjType], opt.opts), name, new_val)
 
 
 def perform_checks(checklist: List[ChecklistObjType]) -> None:
