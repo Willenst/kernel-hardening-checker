@@ -207,10 +207,10 @@ if [ ! -f "$FILE3" ]; then
     if [ -f "$FILE4" ]; then
         echo "$FILE4 exists, hiding it temporarily"
         sudo mv "$FILE4" "$TMP_BACKUP"
-        coverage run -a --branch bin/kernel-hardening-checker -a || exit 1
+        coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
         sudo mv "$TMP_BACKUP" "$FILE4"
     else
-        coverage run -a --branch bin/kernel-hardening-checker -a || exit 1
+        coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
     fi
 else
     echo "$FILE3 exists, skipping this test"
