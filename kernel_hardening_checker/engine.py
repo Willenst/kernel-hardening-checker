@@ -413,12 +413,8 @@ def override_expected_value(checklist: List[ChecklistObjType], name: str, new_va
         if isinstance(opt, SimpleNamedOptCheckTypes):
             if opt.name == name:
                 opt.expected = new_val
-        else:
-            for o in opt.opts:
-                assert(isinstance(o, SimpleNamedOptCheckTypes)), \
-                        f'overriding an expected value for "{o}" is not supported yet'
-                if o.name == name:
-                    o.expected = new_val
+        elif isinstance(opt, ComplexOptCheckTypes):  # Try to decompose complex checks
+            override_expected_value(opt.opts, name, new_val)
 
 
 def perform_checks(checklist: List[ChecklistObjType]) -> None:
