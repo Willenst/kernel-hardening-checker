@@ -1,0 +1,1 @@
+root=/dev/sda l1tf=off mds=full mitigations=off randomize_kstack_offset=on retbleed=0 iommu.passthrough=0 hey hey

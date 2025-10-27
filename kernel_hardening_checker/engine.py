@@ -341,6 +341,7 @@ class AND(ComplexOptCheck):
                                f'unexpected FAIL description "{opt.result}"'
                         self.result = f'FAIL: {opt.name} is off, not found'
                 return
+        return # pragma: no cover
 
 
 # All classes are declared, let's define typing:
