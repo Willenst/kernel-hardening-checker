@@ -88,7 +88,7 @@ class OptCheck:
                 self.result = 'FAIL: is not found'
                 return
             val = self.expected.strip('*')
-            val_list = self.state.strip('"').split(',')
+            val_list = [el.strip() for el in self.state.strip('"').split(',')]
             if val in val_list:
                 self.result = f'OK: in {self.state}'
             else:
