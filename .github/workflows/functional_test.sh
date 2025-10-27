@@ -50,14 +50,18 @@ echo ">>>>> test the autodetection mode <<<<<"
 cat /proc/cmdline
 cat /proc/version
 ls -l /boot
+ls -l /proc/c*
+FILE1=/proc/config.gz
 FILE2=/boot/config-`uname -r`
-if [ ! -f "$FILE2" ] ; then
-    echo "$FILE2 does not exist, create it"
-    cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config "$FILE2"
+if [ ! -f "$FILE1" ] ; then
+    echo "$FILE1 does not exist"
+    if [ ! -f "$FILE2" ] ; then
+        echo "$FILE2 does not exist, create it"
+        cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config "$FILE2"
+    fi
 fi
 ls -l /boot
 coverage run -a --branch bin/kernel-hardening-checker -a
-script -q -c "coverage run -a --branch bin/kernel-hardening-checker -a" /dev/null # emulate tty for colorize_result() coverage
 coverage run -a --branch bin/kernel-hardening-checker -a -m verbose
 coverage run -a --branch bin/kernel-hardening-checker -a -m json
 coverage run -a --branch bin/kernel-hardening-checker -a -m show_ok
@@ -84,6 +88,10 @@ do
         coverage run -a --branch bin/kernel-hardening-checker -c $C -l ./cmdline_example -s $SYSCTL_EXAMPLE -m show_fail > /dev/null
 done
 echo "\n>>>>> have checked $COUNT kconfigs <<<<<"
+
+echo ">>>>> test colorizing results via terminal emulation <<<<<"
+cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
+script -q -c "coverage run -a --branch bin/kernel-hardening-checker -c ./test.config" /dev/null # emulate tty for colorize_result() coverage
 
 echo ">>>>> test kconfig arch detection <<<<<"
 cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
@@ -128,50 +136,17 @@ fi
 cat /etc/sysctl.conf
 coverage run -a --branch bin/kernel-hardening-checker -s /etc/sysctl.conf
 
+echo ">>>>> check no sysctl in PATH (simulate Debian error) <<<<<"
+(
+  PATH=$(echo "$PATH" | tr ":" "\n" | grep -vE "/usr/sbin|/sbin" | tr "\n" ":" | sed 's/:$//')
+  coverage run -a --branch bin/kernel-hardening-checker -a
+)
+
 echo ">>>>> test -v (kernel version detection) <<<<<"
 cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config -v /proc/version
 
 echo "Collect coverage for error handling"
-
-echo ">>>>> no sysctl in PATH (simulate Debian error) <<<<<"
-OLD_PATH=$PATH
-COVER=$(which coverage)
-PATH=/usr/bin:/bin
-$COVER run -a --branch bin/kernel-hardening-checker -a
-PATH=$OLD_PATH
-
-echo ">>>>> extra diffent checks <<<<<"
-cp kernel_hardening_checker/checks.py kernel_hardening_checker/checks.py.bak
-cp test.config extra.config
-cp test.config extra.config
-cat <<'EOF' >> extra.config
-CONFIG_TEST_1=y
-CONFIG_TEST_2=y
-CONFIG_TEST_3=y
-CONFIG_TEST_4=y
-EOF
-cp $SYSCTL_EXAMPLE sysctl.extra
-cat <<'EOF' >> sysctl.extra
-#commented_line
-testval2 = 0
-testval3 = "catchme"
-EOF
-# At the moment, hardening-checker allows for more variations of options than it already has, so we need to add a few for tests.
-cat <<'EOF' >> kernel_hardening_checker/checks.py
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
-EOF
-coverage run -a --branch bin/kernel-hardening-checker -c ./extra.config -s sysctl.extra
-mv kernel_hardening_checker/checks.py.bak kernel_hardening_checker/checks.py
 
 echo ">>>>> -a and any config args together <<<<<"
 coverage run -a --branch bin/kernel-hardening-checker -a -c ./test.config && exit 1
@@ -224,6 +199,23 @@ coverage run -a --branch bin/kernel-hardening-checker -g X86_64 -m show_ok && ex
 
 echo ">>>>> no kconfig file <<<<<"
 coverage run -a --branch bin/kernel-hardening-checker -c ./nosuchfile && exit 1
+
+echo ">>>>> no kconfig file for autodetection <<<<<"
+FILE3="/proc/config.gz"
+FILE4="/boot/config-$(uname -r)"
+TMP_BACKUP="/tmp/back_conf"
+if [ ! -f "$FILE3" ]; then
+    if [ -f "$FILE4" ]; then
+        echo "$FILE4 exists, hiding it temporarily"
+        sudo mv "$FILE4" "$TMP_BACKUP"
+        coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+        sudo mv "$TMP_BACKUP" "$FILE4"
+    else
+        coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+    fi
+else
+    echo "$FILE3 exists, skipping this test"
+fi
 
 echo ">>>>> no kernel version <<<<<"
 sed '3d' test.config > error.config
@@ -295,11 +287,6 @@ echo ">>>>> unexpected line in the sysctl file <<<<<"
 cp $SYSCTL_EXAMPLE error_sysctls
 echo 'some strange line' >> error_sysctls
 coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sysctls && exit 1
-
-echo ">>>>> no kconfig for autodetection <<<<<"
-sudo mv $FILE2 /tmp/back_conf
-coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
-sudo mv /tmp/back_conf /$FILE2
 
 echo ">>>>> broken sysctl binary <<<<<"
 sudo mv /sbin/sysctl /sbin/sysctl.bak

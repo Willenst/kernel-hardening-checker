@@ -292,7 +292,7 @@ class OR(ComplexOptCheck):
                     else:
                         if opt.result == 'OK':
                             self.result = f'OK: {opt.name} is "{opt.expected}"'
-                        elif opt.result.startswith('OK: in \"'):
+                        elif opt.result.startswith('OK: in'):
                             self.result = f'OK: "{opt.expected.strip("*")}" is in {opt.name}'
                         elif opt.result == 'OK: is not found':
                             self.result = f'OK: {opt.name} is not found'
@@ -330,7 +330,7 @@ class AND(ComplexOptCheck):
                 else:
                     if opt.result.startswith('FAIL: \"') or opt.result == 'FAIL: is not found':
                         self.result = f'FAIL: {opt.name} is not "{opt.expected}"'
-                    elif opt.result.startswith('FAIL: not in \"'):
+                    elif opt.result.startswith('FAIL: not in'):
                         self.result = f'FAIL: "{opt.expected.strip("*")}" is not in {opt.name}'
                     elif opt.result == 'FAIL: is not present':
                         self.result = f'FAIL: {opt.name} is not present'
@@ -341,7 +341,6 @@ class AND(ComplexOptCheck):
                                f'unexpected FAIL description "{opt.result}"'
                         self.result = f'FAIL: {opt.name} is off, not found'
                 return
-        return # pragma: no cover
 
 
 # All classes are declared, let's define typing:
@@ -411,15 +410,15 @@ def populate_with_data(checklist: List[ChecklistObjType], data: DictOrTuple, dat
 
 def override_expected_value(checklist: List[ChecklistObjType], name: str, new_val: str) -> None:
     for opt in checklist:
-        if opt.name == name:
-            if isinstance(opt, SimpleNamedOptCheckTypes):
+        if isinstance(opt, SimpleNamedOptCheckTypes):
+            if opt.name == name:
                 opt.expected = new_val
-            else:
-                for o in opt.opts:
-                    assert(isinstance(o, SimpleNamedOptCheckTypes)), \
-                           f'overriding an expected value for "{o}" is not supported yet'
-                    if o.name == name:
-                        o.expected = new_val
+        else:
+            for o in opt.opts:
+                assert(isinstance(o, SimpleNamedOptCheckTypes)), \
+                        f'overriding an expected value for "{o}" is not supported yet'
+                if o.name == name:
+                    o.expected = new_val
 
 
 def perform_checks(checklist: List[ChecklistObjType]) -> None:
