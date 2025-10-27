@@ -136,7 +136,7 @@ fi
 cat /etc/sysctl.conf
 coverage run -a --branch bin/kernel-hardening-checker -s /etc/sysctl.conf
 
-echo ">>>>> check no sysctl in PATH (simulate Debian error) <<<<<"
+echo ">>>>> check no sysctl in PATH (simulate Debian setup) <<<<<"
 (
   PATH=$(echo "$PATH" | tr ":" "\n" | grep -vE "/usr/sbin|/sbin" | tr "\n" ":" | sed 's/:$//')
   coverage run -a --branch bin/kernel-hardening-checker -a
@@ -203,13 +203,13 @@ coverage run -a --branch bin/kernel-hardening-checker -c ./nosuchfile && exit 1
 echo ">>>>> no kconfig file for autodetection <<<<<"
 FILE3="/proc/config.gz"
 FILE4="/boot/config-$(uname -r)"
-TMP_BACKUP="/tmp/back_conf"
 if [ ! -f "$FILE3" ]; then
     if [ -f "$FILE4" ]; then
         echo "$FILE4 exists, hiding it temporarily"
-        sudo mv "$FILE4" "$TMP_BACKUP"
-        coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
-        sudo mv "$TMP_BACKUP" "$FILE4"
+        sudo mv "$FILE4" "$FILE4.bak"
+        ret=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret=$? # recover regardless of the test
+        sudo mv "$FILE4.bak" "$FILE4"
+        [ $ret -eq 0 ] && exit 1
     else
         coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
     fi
@@ -290,9 +290,11 @@ coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sy
 
 echo ">>>>> broken sysctl binary <<<<<"
 sudo mv /sbin/sysctl /sbin/sysctl.bak
-coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+ret_1=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_1=$? # recover regardless of the test
 sudo bash -c 'echo -e "#!/bin/bash\nexit 1" > /sbin/sysctl; chmod +x /sbin/sysctl'
-coverage run -a --branch bin/kernel-hardening-checker -a && exit 1
+ret_2=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_2=$?
 sudo mv /sbin/sysctl.bak /sbin/sysctl
+[ $ret_1 -eq 0 ] && exit 1
+[ $ret_2 -eq 0 ] && exit 1
 
 echo "The end of the functional tests"
