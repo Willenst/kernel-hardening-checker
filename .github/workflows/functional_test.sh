@@ -205,7 +205,7 @@ if [ ! -f "$FILE3" ]; then
     if [ -f "$FILE4" ]; then
         echo "$FILE4 exists, hiding it temporarily"
         sudo mv "$FILE4" "$FILE4.bak"
-        ret=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret=$? # recover regardless of the test
+        ret=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret=$? # check the test result after restoring /sbin/sysctl
         sudo mv "$FILE4.bak" "$FILE4"
         [ $ret -eq 0 ] && exit 1
     else
@@ -288,9 +288,9 @@ coverage run -a --branch bin/kernel-hardening-checker -c test.config -s error_sy
 
 echo ">>>>> broken sysctl binary <<<<<"
 sudo mv /sbin/sysctl /sbin/sysctl.bak
-ret_1=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_1=$? # recover regardless of the test
+ret_1=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_1=$? # check the test result after restoring /sbin/sysctl
 sudo bash -c 'echo -e "#!/bin/bash\nexit 1" > /sbin/sysctl; chmod +x /sbin/sysctl'
-ret_2=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_2=$?
+ret_2=0; coverage run -a --branch bin/kernel-hardening-checker -a || ret_2=$? # check the test result after restoring /sbin/sysctl
 sudo mv /sbin/sysctl.bak /sbin/sysctl
 [ $ret_1 -eq 0 ] && exit 1
 [ $ret_2 -eq 0 ] && exit 1
