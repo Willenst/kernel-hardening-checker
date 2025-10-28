@@ -89,10 +89,6 @@ do
 done
 echo "\n>>>>> have checked $COUNT kconfigs <<<<<"
 
-echo ">>>>> test colorizing results via terminal emulation <<<<<"
-cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
-script -q -c "coverage run -a --branch bin/kernel-hardening-checker -c ./test.config" /dev/null # emulate tty for colorize_result() coverage
-
 echo ">>>>> test kconfig arch detection <<<<<"
 cp $CONFIG_DIR/defconfigs/x86_64_defconfig_6.6.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config | grep "Detected architecture: X86_64"
@@ -143,8 +139,10 @@ echo ">>>>> check no sysctl in PATH (simulate Debian setup) <<<<<"
 )
 
 echo ">>>>> test -v (kernel version detection) <<<<<"
-cp kernel_hardening_checker/config_files/distros/Arch_x86_64.config ./test.config
 coverage run -a --branch bin/kernel-hardening-checker -c ./test.config -v /proc/version
+
+echo ">>>>> test colorizing results via terminal emulation <<<<<"
+script -q -c "coverage run -a --branch bin/kernel-hardening-checker -c ./test.config" /dev/null # emulate tty for colorize_result() coverage
 
 echo "Collect coverage for error handling"
 
