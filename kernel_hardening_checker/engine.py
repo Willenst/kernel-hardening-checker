@@ -15,11 +15,10 @@ This module is the engine of checks.
 from __future__ import annotations
 import sys
 
-from typing import Union, Optional
-StrOrNone = Optional[str]
-TupleOrNone = Optional[tuple[int, ...]]
-DictOrtuple = Union[dict[str, str], tuple[int, ...]]
-StrOrBool = Union[str, bool]
+StrOrNone = str | None
+TupleOrNone = tuple[int, ...] | None
+DictOrTuple = dict[str, str] | tuple[int, ...]
+StrOrBool = str | bool
 
 GREEN_COLOR = '\x1b[32m'
 RED_COLOR = '\x1b[31m'
@@ -346,23 +345,22 @@ class AND(ComplexOptCheck):
 # All classes are declared, let's define typing:
 #  1) basic simple check objects
 SIMPLE_OPTION_TYPES = ('kconfig', 'cmdline', 'sysctl', 'version')
-SimpleOptCheckType = Union[KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck]
+SimpleOptCheckType = KconfigCheck | CmdlineCheck | SysctlCheck | VersionCheck
 SimpleOptCheckTypes = (KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck) # pylint: disable=C0103
-SimpleNamedOptCheckType = Union[KconfigCheck, CmdlineCheck, SysctlCheck]
+SimpleNamedOptCheckType = KconfigCheck | CmdlineCheck | SysctlCheck
 SimpleNamedOptCheckTypes = (KconfigCheck, CmdlineCheck, SysctlCheck) # pylint: disable=C0103
 
 #  2) complex objects that may contain complex and simple objects
-ComplexOptCheckType = Union[OR, AND]
+ComplexOptCheckType = OR | AND
 ComplexOptCheckTypes = (OR, AND) # pylint: disable=C0103
 
 #  3) objects that can be added to the checklist
-ChecklistObjType = Union[KconfigCheck, CmdlineCheck, SysctlCheck, OR, AND]
+ChecklistObjType = KconfigCheck | CmdlineCheck | SysctlCheck | OR | AND
 
 #  4) all existing objects
-AnyOptCheckType = Union[KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND]
+AnyOptCheckType = KconfigCheck | CmdlineCheck | SysctlCheck | VersionCheck | OR | AND
 
-
-def populate_simple_opt_with_data(opt: SimpleOptCheckType, data: dictOrtuple, data_type: str) -> None:
+def populate_simple_opt_with_data(opt: SimpleOptCheckType, data: DictOrTuple, data_type: str) -> None:
     assert(opt.opt_type != 'complex'), f'unexpected opt_type "{opt.opt_type}" for {opt}'
     assert(opt.opt_type in SIMPLE_OPTION_TYPES), f'invalid opt_type "{opt.opt_type}"'
     assert(data_type in SIMPLE_OPTION_TYPES), f'invalid data_type "{data_type}"'
@@ -384,7 +382,7 @@ def populate_simple_opt_with_data(opt: SimpleOptCheckType, data: dictOrtuple, da
         opt.set_state(data)
 
 
-def populate_opt_with_data(opt: AnyOptCheckType, data: dictOrtuple, data_type: str) -> None:
+def populate_opt_with_data(opt: AnyOptCheckType, data: DictOrTuple, data_type: str) -> None:
     assert(opt.opt_type != 'version'), 'a single VersionCheck is useless'
     if opt.opt_type != 'complex':
         assert(isinstance(opt, SimpleOptCheckTypes)), \
@@ -403,7 +401,7 @@ def populate_opt_with_data(opt: AnyOptCheckType, data: dictOrtuple, data_type: s
                 populate_opt_with_data(o, data, data_type)
 
 
-def populate_with_data(checklist: list[ChecklistObjType], data: dictOrtuple, data_type: str) -> None:
+def populate_with_data(checklist: list[ChecklistObjType], data: DictOrTuple, data_type: str) -> None:
     for opt in checklist:
         populate_opt_with_data(opt, data, data_type)
 
