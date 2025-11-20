@@ -12,11 +12,10 @@ This module contains knowledge for checks.
 # pylint: disable=missing-function-docstring,line-too-long
 # pylint: disable=too-many-branches,too-many-statements,too-many-locals
 
-from typing import List
 from .engine import StrOrNone, ChecklistObjType, KconfigCheck, CmdlineCheck, SysctlCheck, VersionCheck, OR, AND
 
 
-def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
+def add_kconfig_checks(l: list[ChecklistObjType], arch: str) -> None:
     assert(arch), 'empty arch'
 
     # Calling the KconfigCheck class constructor:
@@ -572,7 +571,7 @@ def add_kconfig_checks(l: List[ChecklistObjType], arch: str) -> None:
         l += [KconfigCheck('harden_userspace', 'kspp', 'X86_USER_SHADOW_STACK', 'y')]
 
 
-def add_cmdline_checks(l: List[ChecklistObjType], arch: str) -> None:
+def add_cmdline_checks(l: list[ChecklistObjType], arch: str) -> None:
     assert(arch), 'empty arch'
 
     # Calling the CmdlineCheck class constructor:
@@ -692,6 +691,7 @@ def add_cmdline_checks(l: List[ChecklistObjType], arch: str) -> None:
     l += [CmdlineCheck('self_protection', 'kspp', 'slab_merge', 'is not set')] # consequence of 'slab_nomerge' by kspp
     l += [CmdlineCheck('self_protection', 'kspp', 'slub_merge', 'is not set')] # consequence of 'slab_nomerge' by kspp
     l += [CmdlineCheck('self_protection', 'kspp', 'page_alloc.shuffle', '1')]
+    l += [CmdlineCheck('self_protection', 'kspp', 'hash_pointers', 'always')]
     l += [OR(CmdlineCheck('self_protection', 'kspp', 'slab_nomerge', 'is present'),
              AND(KconfigCheck('self_protection', 'kspp', 'SLAB_MERGE_DEFAULT', 'is not set'),
                  CmdlineCheck('self_protection', 'kspp', 'slab_merge', 'is not set'),
@@ -773,10 +773,10 @@ def add_cmdline_checks(l: List[ChecklistObjType], arch: str) -> None:
                  AND(KconfigCheck('cut_attack_surface', 'kspp', 'LEGACY_VSYSCALL_NONE', 'y'),
                      CmdlineCheck('-', '-', 'vsyscall', 'is not set')))]
         l += [OR(CmdlineCheck('cut_attack_surface', 'kspp', 'vdso32', '0'),
-                 CmdlineCheck('cut_attack_surface', 'a13xp0p0v', 'vdso32', '1'),
                  AND(KconfigCheck('cut_attack_surface', 'kspp', 'COMPAT_VDSO', 'is not set'),
                      CmdlineCheck('-', '-', 'vdso32', 'is not set')))]
-                 # the vdso32 parameter must not be 2
+                 # disable 32-bit VDSO entirely or at least ensure that COMPAT_VDSO is disabled
+                 # (on old kernels, this kconfig option turned on dangerous vdso32=2)
         l += [OR(CmdlineCheck('cut_attack_surface', 'kspp', 'ia32_emulation', '0'),
                  KconfigCheck('cut_attack_surface', 'kspp', 'IA32_EMULATION', 'is not set'),
                  AND(KconfigCheck('cut_attack_surface', 'a13xp0p0v', 'IA32_EMULATION_DEFAULT_DISABLED', 'y'),
@@ -848,6 +848,7 @@ no_kstrtobool_options = [
     'lockdown', # see lockdown_param() in security/lockdown/lockdown.c
     'intel_iommu', # see intel_iommu_setup() in drivers/iommu/intel/iommu.c
     'efi', # see efi_parse_options() in drivers/firmware/efi/libstub/efi-stub-helper.c
+    'hash_pointers', # see hash_pointers_mode_parse() in lib/vsprintf.c
     'proc_mem.force_override' # see early_proc_mem_force_override() in fs/proc/base.c
 ]
 
@@ -867,7 +868,7 @@ def normalize_cmdline_options(option: str, value: str) -> str:
     return value
 
 
-def add_sysctl_checks(l: List[ChecklistObjType], arch: StrOrNone) -> None:
+def add_sysctl_checks(l: list[ChecklistObjType], arch: StrOrNone) -> None:
     # Calling the SysctlCheck class constructor:
     #   SysctlCheck(reason, decision, name, expected)
 
@@ -980,35 +981,7 @@ def add_sysctl_checks(l: List[ChecklistObjType], arch: StrOrNone) -> None:
     # 'harden_userspace', 'a13xp0p0v'
     l += [SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_bits', 'MAX')]
           # 'MAX' value is refined using ARCH_MMAP_RND_BITS_MAX
-    l += [SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_compat_bits', 'MAX')]
-          # 'MAX' value is refined using ARCH_MMAP_RND_COMPAT_BITS_MAX
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval2', 'is not off'))]
-    l += [AND(SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', 'y'),
-              SysctlCheck('harden_userspace', 'a13xp0p0v', 'testval3', '*y*'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_1', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_2', 'is present'))]
-    l += [OR(KconfigCheck('self_protection', 'defconfig', 'TEST_3', 'is not set'),
-             KconfigCheck('self_protection', 'defconfig', 'TEST_4', 'is not off'))]
+    l += [OR(SysctlCheck('harden_userspace', 'a13xp0p0v', 'vm.mmap_rnd_compat_bits', 'MAX'),
+             KconfigCheck('cut_attack_surface', 'kspp', 'COMPAT', 'is not set'))]
+             # 'MAX' value is refined using ARCH_MMAP_RND_COMPAT_BITS_MAX,
+             # however vm.mmap_rnd_compat_bits disappears if COMPAT is disabled.
