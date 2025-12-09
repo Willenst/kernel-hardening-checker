@@ -80,10 +80,9 @@ def get_local_kconfig_file(version_fname: str) -> tuple[StrOrNone, str]:
 
 def get_local_sysctl_file() -> tuple[StrOrNone, str]:
     sysctl_bin = shutil.which('sysctl')
-    if not sysctl_bin:
+    if not sysctl_bin and os.path.isfile('/sbin/sysctl'):
         # fix for Debian
-        if os.path.isfile('/sbin/sysctl'):
-            sysctl_bin = '/sbin/sysctl'
+        sysctl_bin = '/sbin/sysctl'
     if not sysctl_bin:
         return None, 'sysctl command is not found on this machine'
 
@@ -147,9 +146,8 @@ def detect_kernel_version(fname: str) -> tuple[TupleOrNone, str]:
                 ver_str = parts[2].replace('+', '-')
                 ver_numbers_str = ver_str.split('-', 1)[0]
                 ver_numbers = ver_numbers_str.split('.')
-                if len(ver_numbers) >= 3:
-                    if all(map(lambda x: x.isdecimal(), ver_numbers)):
-                        return tuple(map(int, ver_numbers)), 'OK'
+                if all(map(lambda x: x.isdecimal(), ver_numbers)) and len(ver_numbers) >= 3:
+                    return tuple(map(int, ver_numbers)), 'OK'
                 msg = f'failed to parse the version "{parts[2]}"'
                 return None, msg
         return None, 'no kernel version detected'
@@ -323,7 +321,7 @@ def parse_sysctl_file(mode: StrOrNone, parsed_options: dict[str, str], fname: st
 
 def refine_check(mode: StrOrNone, checklist: list[ChecklistObjType], parsed_options: dict[str, str],
                  target: str, source: str) -> None:
-    source_val = parsed_options.get(source, None)
+    source_val = parsed_options.get(source)
     if source_val:
         override_expected_value(checklist, target, source_val)
     else:
