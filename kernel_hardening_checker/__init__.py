@@ -144,8 +144,8 @@ def detect_kernel_version(fname: str) -> tuple[TupleOrNone, str]:
         ver_pattern = re.compile(r"^# Linux/.+ Kernel Configuration$|^Linux version .+")
         for line in f.readlines():
             if ver_pattern.match(line):
-                line = line.strip()
-                parts = line.split()
+                stripped_line = line.strip()
+                parts = stripped_line.split()
                 ver_str = parts[2].replace('+', '-')
                 ver_numbers_str = ver_str.split('-', 1)[0]
                 ver_numbers = ver_numbers_str.split('.')
@@ -233,25 +233,25 @@ def parse_kconfig_file(_mode: StrOrNone, parsed_options: dict[str, str], fname: 
         opt_is_off = re.compile(r"# CONFIG_[a-zA-Z0-9_]+ is not set$")
 
         for line in f.readlines():
-            line = line.strip()
+            stripped_line = line.strip()
             option = None
             value = None
 
-            if opt_is_on.match(line):
-                option, value = line.split('=', 1)
+            if opt_is_on.match(stripped_line):
+                option, value = stripped_line.split('=', 1)
                 if value == 'is not set':
-                    sys.exit(f'[-] ERROR: bad enabled Kconfig option "{line}"')
+                    sys.exit(f'[-] ERROR: bad enabled Kconfig option "{stripped_line}"')
                 if value == '':
                     print(f'[!] WARNING: found strange Kconfig option {option} with empty value')
-            elif opt_is_off.match(line):
-                option, value = line[2:].split(' ', 1)
+            elif opt_is_off.match(stripped_line):
+                option, value = stripped_line[2:].split(' ', 1)
                 assert (value == 'is not set'), \
-                       f'unexpected value of disabled Kconfig option "{line}"'
-            elif line != '' and not line.startswith('#'):
-                sys.exit(f'[-] ERROR: unexpected line in Kconfig file: "{line}"')
+                       f'unexpected value of disabled Kconfig option "{stripped_line}"'
+            elif stripped_line != '' and not stripped_line.startswith('#'):
+                sys.exit(f'[-] ERROR: unexpected line in Kconfig file: "{stripped_line}"')
 
             if option in parsed_options:
-                sys.exit(f'[-] ERROR: Kconfig option "{line}" is found multiple times')
+                sys.exit(f'[-] ERROR: Kconfig option "{stripped_line}" is found multiple times')
 
             if option:
                 assert (value is not None), f'unexpected None value for {option}'
@@ -291,18 +291,18 @@ def parse_sysctl_file(mode: StrOrNone, parsed_options: dict[str, str], fname: st
         sysctl_pattern = re.compile(r"[a-zA-Z0-9/*._-]+ ?=.*$")
         sysctl_eperm_pattern = re.compile(r"sysctl: permission denied on key '([a-zA-Z0-9/*._-]+)'")
         for line in f.readlines():
-            line = line.strip()
-            if not line or line.startswith('#'):
+            stripped_line = line.strip()
+            if not stripped_line or stripped_line.startswith('#'):
                 continue
-            if line.startswith('sysctl: '):
+            if stripped_line.startswith('sysctl: '):
                 # this line came from stderr
-                if m := sysctl_eperm_pattern.match(line):
+                if m := sysctl_eperm_pattern.match(stripped_line):
                     option = m.group(1)
                     parsed_options[option] = 'permission denied'
                 continue
-            if not sysctl_pattern.match(line):
-                sys.exit(f'[-] ERROR: unexpected line in sysctl file: "{line}"')
-            option, value = line.split('=', 1)
+            if not sysctl_pattern.match(stripped_line):
+                sys.exit(f'[-] ERROR: unexpected line in sysctl file: "{stripped_line}"')
+            option, value = stripped_line.split('=', 1)
             option = option.strip()
             value = value.strip()
             # sysctl options may be found multiple times, let's save the last value:
