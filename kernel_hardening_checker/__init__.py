@@ -241,13 +241,13 @@ def parse_kconfig_file(_mode: StrOrNone, parsed_options: dict[str, str], fname: 
                 option, value = stripped_line.split('=', 1)
                 if value == 'is not set':
                     sys.exit(f'[-] ERROR: bad enabled Kconfig option "{stripped_line}"')
-                if value == '':
+                if not value:
                     print(f'[!] WARNING: found strange Kconfig option {option} with empty value')
             elif opt_is_off.match(stripped_line):
                 option, value = stripped_line[2:].split(' ', 1)
                 assert (value == 'is not set'), \
                        f'unexpected value of disabled Kconfig option "{stripped_line}"'
-            elif stripped_line != '' and not stripped_line.startswith('#'):
+            elif stripped_line and not stripped_line.startswith('#'):
                 sys.exit(f'[-] ERROR: unexpected line in Kconfig file: "{stripped_line}"')
 
             if option in parsed_options:
