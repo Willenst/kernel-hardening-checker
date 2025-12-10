@@ -10,7 +10,7 @@ This module contains knowledge for checks.
 """
 
 # pylint: disable=missing-function-docstring,line-too-long
-# pylint: disable=too-many-branches,too-many-statements,too-many-locals
+# pylint: disable=too-many-branches,too-many-statements,too-many-locals,too-many-lines
 
 from .engine import (
     AND,
