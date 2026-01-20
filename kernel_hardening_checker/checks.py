@@ -777,6 +777,14 @@ def add_cmdline_checks(l: list[ChecklistObjType], arch: str) -> None:
     if arch in {'X86_64', 'X86_32'}:
         l += [CmdlineCheck('self_protection', 'clipos', 'iommu', 'force')]
 
+    # 'self_protection', 'a13xp0p0v'
+    if arch in {'X86_64', 'X86_32'}:
+        l += [AND(CmdlineCheck('self_protection', 'a13xp0p0v', 'amd_iommu', '*force_isolation*'),
+                  CmdlineCheck('self_protection', 'defconfig', 'amd_iommu', 'is not off'),
+                  AND(KconfigCheck('self_protection', 'defconfig', 'IOMMU_DEFAULT_PASSTHROUGH', 'is not set'),
+                      CmdlineCheck('-', '-', 'iommu.passthrough', 'is not set')))]
+              # will be almost useless if any iommu passthrough present, including iommu=pt
+
     # 'cut_attack_surface', 'defconfig'
     if arch in {'X86_64', 'X86_32'}:
         tsx_not_set = CmdlineCheck('cut_attack_surface', 'defconfig', 'tsx', 'is not set')
@@ -868,6 +876,7 @@ no_kstrtobool_options = [
     'tsx',  # see tsx_init() in arch/x86/kernel/cpu/tsx.c
     'lockdown',  # see lockdown_param() in security/lockdown/lockdown.c
     'intel_iommu',  # see intel_iommu_setup() in drivers/iommu/intel/iommu.c
+    'amd_iommu'  # see parse_amd_iommu_options() in drivers/iommu/amd/init.c
     'efi',  # see efi_parse_options() in drivers/firmware/efi/libstub/efi-stub-helper.c
     'hash_pointers',  # see hash_pointers_mode_parse() in lib/vsprintf.c
     'ipv6.disable',  # see the disable_ipv6_mod parameter in net/ipv6/af_inet6.c
