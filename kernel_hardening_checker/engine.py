@@ -86,7 +86,9 @@ class OptCheck:
                 return
             val = self.expected.strip('*')
             val_list = self.state.strip('"').split(',')
-            if val in val_list:
+            if 'off' in val_list:
+                self.result = f'FAIL: off in {self.state}'
+            elif val in val_list:
                 self.result = f'OK: in {self.state}'
             else:
                 self.result = f'FAIL: not in {self.state}'
