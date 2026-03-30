@@ -225,6 +225,10 @@ class ComplexOptCheck:
                f'useless {self.__class__.__name__} check: {opts}'
         assert (isinstance(self.opts[0], SimpleNamedOptCheckTypes)), \
                f'invalid {self.__class__.__name__} check: {opts}'
+        for o in self.opts[1:]:
+            assert not isinstance(o, self.__class__), \
+                   f'redundant nested {self.__class__.__name__} check, ' \
+                   f'flatten it into a single {self.__class__.__name__}(...)'
         self.result = None  # type: str | None
 
     @property
