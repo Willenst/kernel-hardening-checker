@@ -781,8 +781,8 @@ def add_cmdline_checks(l: list[ChecklistObjType], arch: str) -> None:
     if arch in {'X86_64', 'X86_32'}:
         l += [AND(CmdlineCheck('self_protection', 'a13xp0p0v', 'amd_iommu', '*force_isolation*'),
                   CmdlineCheck('self_protection', 'defconfig', 'amd_iommu', 'is not off'),
-                  AND(KconfigCheck('self_protection', 'defconfig', 'IOMMU_DEFAULT_PASSTHROUGH', 'is not set'),
-                      CmdlineCheck('-', '-', 'iommu.passthrough', 'is not set')))]
+                  KconfigCheck('self_protection', 'defconfig', 'IOMMU_DEFAULT_PASSTHROUGH', 'is not set'),
+                  CmdlineCheck('-', '-', 'iommu.passthrough', 'is not set'))]
               # will be almost useless if any iommu passthrough present, including iommu=pt
 
     # 'cut_attack_surface', 'defconfig'
